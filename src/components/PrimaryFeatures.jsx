@@ -12,27 +12,27 @@ import screenshotVatReturns from '@/images/screenshots/vat-returns.png'
 
 const features = [
   {
-    title: 'Payroll',
+    title: 'Create a Trello Card',
     description:
-      "Keep track of everyone's salaries and whether or not they've been paid. Direct deposit not supported.",
+      "Add a card to your 'To-Do' list, detailing the feature, error specifics, reproduction steps, relevant commit permalink, and acceptance criteria. Label as a Bug or Feature and assign the card to Raja.",
     image: screenshotPayroll,
   },
   {
-    title: 'Claim expenses',
+    title: 'Watch the LLM do its magic',
     description:
-      "All of your receipts organized into one place, as long as you don't mind typing in the data by hand.",
+      "Raja will investigate the bug, generate a solution for it powered by gpt-3.5-turbo-16k-0613 model.",
     image: screenshotExpenses,
   },
   {
-    title: 'VAT handling',
+    title: 'Review PR submitted by Raja',
     description:
-      "We only sell our software to companies who don't deal with VAT at all, so technically we do all the VAT stuff they need.",
+      "Raja will submit a Pull Request for review. Reviewers can either approve the PR or suggest modifications, upon which Raja will diligently refine the solution.",
     image: screenshotVatReturns,
   },
   {
-    title: 'Reporting',
+    title: 'Manage progress on the dashboard',
     description:
-      'Easily export your data into an Excel spreadsheet where you can do whatever the hell you want with it.',
+      'Assign Raja new tickets and manage progress on the dashboard.',
     image: screenshotReporting,
   },
 ]
@@ -72,11 +72,10 @@ export function PrimaryFeatures() {
       <Container className="relative">
         <div className="max-w-2xl md:mx-auto md:text-center xl:max-w-none">
           <h2 className="font-display text-3xl tracking-tight text-white sm:text-4xl md:text-5xl">
-            Everything you need to run your books.
+            Easily integrate Raja into your workflow.
           </h2>
           <p className="mt-6 text-lg tracking-tight text-blue-100">
-            Well everything you need if you aren’t that picky about minor
-            details like tax compliance.
+            Deploy Raja to speed up development every step of the way.
           </p>
         </div>
         <Tab.Group

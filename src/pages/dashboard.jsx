@@ -20,17 +20,18 @@ export default function Home() {
           content="Raja is your open-source, AI-powered junior developer who understands your engineering tickets, crafts code, and submits pull requests in mere minutes."
         />
       </Head>
-      <Header />
+{/*       <Header /> */}
       <main>
-        <Hero />
-        <PrimaryFeatures />
+      DASHBOARD
+{/*         <Hero /> */}
+{/*         <PrimaryFeatures /> */}
 {/*         <SecondaryFeatures /> */}
 {/*         <CallToAction /> */}
 {/*         <Testimonials /> */}
 {/*         <Pricing /> */}
-        <Faqs />
+{/*         <Faqs /> */}
       </main>
-      <Footer />
+{/*       <Footer /> */}
     </>
   )
 }
