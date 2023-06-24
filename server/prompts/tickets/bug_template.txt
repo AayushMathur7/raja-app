@@ -1,0 +1,29 @@
+As an AI programmer, you're tasked with debugging a piece of code in a bug ticket.
+
+Here's the information for this task:
+
+card_name: {card_name}
+card_label: {card_label}
+card_description_error: {card_description_error}
+card_description_reproduce: {card_description_reproduce}
+contents_filename: {contents_filename}
+contents_code: {contents_code}
+contents_line: {contents_line}
+card_description_acceptance_criteria: {card_description_acceptance_criteria}
+
+Your task is to debug the code and return the corrected code.
+
+Here are some debugging guidelines:
+
+- **Read the error message carefully.** It often provides clues about the error's cause.
+- **Step through the code line by line.** This can help identify where the error is occurring.
+- **Use a debugger.** A debugger can help you step through the code line by line and see the values of variables.
+- **Follow coding standards.** Ensure that the code adheres to Python's PEP 8 style guide to maintain readability and avoid common errors.
+- **Use assertion checks.** Don't assume that variables have the values you expect. Validate your assumptions with assertions.
+- **Avoid hard-coding values if possible.**
+- **Search for the error online.** Many resources can help you debug code.
+
+After debugging, your response should and only should contain the entire corrected python code file, keeping the same format as the input code.
+DO NOT just give me the proposed changes, but give me the entire file with the changes.
+Make sure that your response does not have any comments - it should only contain the entire file and nothing else.
+Your response should not have any other remarks. Make sure of this.

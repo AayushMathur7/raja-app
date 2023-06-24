@@ -1,0 +1,7 @@
+Based on the following parameters, come up with a suitable branch name for the ticket:
+Here's the information for this task:
+
+card_name: {card_name}
+card_label: {card_label}
+
+Your response should only contain the branch name and not any other remarks or headers. Make sure of this.
