@@ -3,9 +3,11 @@ import os
 from dataclasses import dataclass, field
 
 from dotenv import load_dotenv
+from embeddings import metadata_field_info, vector_store
 from langchain import PromptTemplate
 from langchain.chains import LLMChain
 from langchain.chat_models import ChatOpenAI
+from langchain.retrievers import SelfQueryRetriever
 
 # Load environment variables from .env file
 load_dotenv()
@@ -35,10 +37,10 @@ TEMPLATE_VARIABLES = {
 
 TEMPLATE_FILEPATHS = {
     "bug": {
-        "bug": "prompts/tickets/bug_template.txt",
-        "branch_name": "prompts/pr_branch_template.txt",
-        "pr_title": "prompts/pr_title_template.txt",
-        "pr_body": "prompts/pr_body_template.txt",
+        "bug": "server/prompts/tickets/bug_template.txt",
+        "branch_name": "server/prompts/pr_branch_template.txt",
+        "pr_title": "server/prompts/pr_title_template.txt",
+        "pr_body": "server/prompts/pr_body_template.txt",
     },
     "feature": {
         # define file paths for feature here
@@ -71,6 +73,14 @@ def run_llm_chain(template_str, **kwargs):
 def raja_agent(req_body):
     card = Card(**req_body)
     file, metadata = {}, {}
+
+    # document_description = "Stores the code in the file"
+    #
+    # retriever = SelfQueryRetriever.from_llm(
+    #     LLM, vector_store, document_description, metadata_field_info, verbose=True
+    # )
+    #
+    # print(retriever.get_relevant_documents(card.description))
 
     for template_name, variables in TEMPLATE_VARIABLES[card.type].items():
         kwargs = {var: getattr(card, var, None) for var in variables}

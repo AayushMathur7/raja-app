@@ -17,6 +17,7 @@ pre-commit = "*"
 bs4 = "*"
 python-dotenv = "*"
 openai = "*"
+lark = "*"
 
 [dev-packages]
 

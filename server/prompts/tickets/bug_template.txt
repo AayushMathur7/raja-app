@@ -2,14 +2,12 @@ As an AI programmer, you're tasked with debugging a piece of code in a bug ticke
 
 Here's the information for this task:
 
-card_name: {card_name}
-card_label: {card_label}
-card_description_error: {card_description_error}
-card_description_reproduce: {card_description_reproduce}
-contents_filename: {contents_filename}
-contents_code: {contents_code}
-contents_line: {contents_line}
-card_description_acceptance_criteria: {card_description_acceptance_criteria}
+name: {name}
+label: {label}
+description: {description}
+how_to_reproduce: {how_to_reproduce}
+acceptance_criteria: {acceptance_criteria}
+
 
 Your task is to debug the code and return the corrected code.
 

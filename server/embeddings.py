@@ -9,6 +9,7 @@ import pinecone
 import requests
 import tiktoken
 from dotenv import load_dotenv
+from langchain.chains.query_constructor.schema import AttributeInfo
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import Pinecone
@@ -36,6 +37,13 @@ vector_store = Pinecone(
     text_key="text",
     namespace="raja",
 )
+metadata_field_info = [
+    AttributeInfo(
+        name="document_id",
+        description="The file path where the code is stored",
+        type="string",
+    ),
+]
 
 
 def execute_embedding_workflow(repo_url, folder_path):
