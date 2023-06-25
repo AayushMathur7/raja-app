@@ -2,9 +2,8 @@ import Head from 'next/head'
 import React, { useContext, useState } from 'react';
 import { TaskContext } from '@/contexts/TaskContext'
 import { StatusType } from '@/enums/StatusType'
-import { rajaAgent } from '@/api/dashboard';
+import { rajaAgent,getTickets } from '@/api/dashboard';
 import { ConvexProvider, ConvexReactClient } from "convex/react";
-
 
 function getStatusText(status) {
     if (status === StatusType.READY_TO_DEPLOY) {
@@ -50,10 +49,19 @@ export default function TaskTable() {
   const { tasks, addTask, updateTask } = useContext(TaskContext);
   const [pullRequestLink, setPullRequestLink] = useState(null)
 
-  const handleDeploy = (event, task) => {
+  const handleDeploy = (event, taskToUpdate) => {
     event.preventDefault();
-    console.log("Deploying Raja for this task:", task?.name)
-    rajaAgent(task).then(r => setPullRequestLink(r.message)).catch(err => console.error(err));
+
+    const updatedTasks = tasks.map(task =>
+      task.name === taskToUpdate.name
+        ? { ...task, status: StatusType.IN_PROGRESS }
+        : task
+    );
+
+    updateTask(updatedTasks);
+
+    console.log("Deploying Raja for this task:", taskToUpdate?.name)
+    rajaAgent(taskToUpdate).then(r => setPullRequestLink(r.message)).catch(err => console.error(err));
   }
 
   return (
@@ -80,18 +88,18 @@ export default function TaskTable() {
                   </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 bg-white">
-                  {tasks.map((task) => (
-                    <tr key={task.name}>
+                  {tasks?.map((task) => (
+                    <tr key={task["name"]}>
                       <td className="whitespace-nowrap py-5 pl-4 pr-3 text-sm sm:pl-4">
                         <div className="flex items-center flex-wrap">
                           <div className="overflow-hidden overflow-ellipsis whitespace-normal max-w-[360px]">
-                            <div className="font-medium text-gray-900">{task.name}</div>
-                            <div className="mt-1 text-sm text-gray-500">{task.type}</div>
+                            <div className="font-medium text-gray-900">{task["name"]}</div>
+{/*                             <div className="mt-1 text-sm text-gray-500">{task["type"]}</div> */}
                           </div>
                         </div>
                       </td>
                       <td className="whitespace-nowrap px-3 py-5 text-sm text-gray-500">
-                        {getStatusPill(task.status)}
+                        {getStatusPill(task["status"])}
                       </td>
                       <td className="whitespace-nowrap px-2 py-4 text-xs text-gray-500">
                           <button

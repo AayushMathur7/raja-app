@@ -6,12 +6,14 @@ export const get = query(async ({ db }) => {
 
 export const addRepo = mutation(async ({ db }, body) => {
   const {
+    user_id = null,
+    user_email = null,
     url = null,
     owner = null,
     name = null,
   } = body;
 
-  const repoId = await db.insert("repo", { url, owner, name });
+  const repoId = await db.insert("repo", { url, owner, name, user_email, user_id });
 
   return repoId;
 });

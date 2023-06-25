@@ -1,18 +1,27 @@
 import TaskTemplate from '@/components/dashboard/TaskTemplate'
 import TaskTable from '@/components/dashboard/TaskTable'
 // import { TicketTemplate } from '@/components/dashboard/TicketTemplate'
-import { initializeRepo } from '@/api/dashboard';
-import {useState} from "react";
+import { initializeRepo, getTickets } from '@/api/dashboard';
+import { useState, useContext, useRef, useEffect } from "react";
 import { ClerkProvider, UserButton, SignedIn, SignedOut, SignIn } from '@clerk/nextjs'
-
+import { useUser } from "@clerk/clerk-react";
+import { TaskContext } from '@/contexts/TaskContext'
 
 export default function Dashboard() {
   const [repoLink, setRepoLink] = useState("");
+  const { user } = useUser();
+  const { tasks, addTask, initializeTasks, updateTask } = useContext(TaskContext);
+
+  const initialized = useRef(false)
+
+  useEffect(() => {
+        getTickets().then(r => initializeTasks(r)).catch(err => console.error(err));
+  }, []);
 
   const handleSubmit = (event) => {
     event.preventDefault();
     console.log("Submitting repo link:", repoLink)
-    initializeRepo(repoLink).then(r => console.log(r)).catch(err => console.error(err));
+    initializeRepo(user.primaryEmailAddressId, user.primaryEmailAddress, repoLink).then(r => console.log(r)).catch(err => console.error(err));
   }
 
   return <>

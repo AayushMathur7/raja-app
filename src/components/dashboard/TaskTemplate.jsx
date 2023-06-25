@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { TaskContext } from '@/contexts/TaskContext'
 import { StatusType } from '@/enums/StatusType'
-import {rajaAgent} from "@/api/dashboard";
+import { createTicket } from '@/api/dashboard';
 
 export default function TaskTemplate() {
 
@@ -20,18 +20,28 @@ export default function TaskTemplate() {
             setEmptyInputError(true)
             return
         }
-       addTask({
+
+       const taskObj = {
          name: name,
          type: type,
          description: description,
          acceptance_criteria: acceptanceCriteria,
          how_to_reproduce: howToReproduce,
          status: StatusType.READY_TO_DEPLOY
-       });
+       }
+
+       addTask(taskObj);
 
        setEmptyInputError(false)
-       rajaAgent(task).then(r => setPullRequestLink(r.message)).catch(err => console.error(err));
+       createTicket(taskObj).then(r => console.log(r)).catch(err => console.error(err));
+
   };
+
+//     const handleSubmit = (event) => {
+//     event.preventDefault();
+//     console.log("Submitting repo link:", repoLink)
+//     initializeRepo(user.primaryEmailAddressId, user.primaryEmailAddress, repoLink).then(r => console.log(r)).catch(err => console.error(err));
+//   }
 
   return (
     <div className="py-12">

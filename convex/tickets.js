@@ -10,10 +10,11 @@ export const createTicket = mutation(async ({ db }, body) => {
     description = null,
     type = null,
     acceptance_criteria = null,
-    how_to_reproduce = null
+    how_to_reproduce = null,
+    status = null,
   } = body;
 
-  const ticketId = await db.insert("tickets", { name, description, type, acceptance_criteria, how_to_reproduce });
+  const ticketId = await db.insert("tickets", { name, description, type, acceptance_criteria, how_to_reproduce, status });
 
   return ticketId;
 });

@@ -1,11 +1,11 @@
-export const initializeRepo = async (repoLink) => {
+export const initializeRepo = async (userEmailId, userEmail, repoLink) => {
     try {
         const response = await fetch('http://localhost:5000/v1/initialize-repo', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ repo_url: repoLink })
+            body: JSON.stringify({ user_id: userEmailId, user_email: userEmail, repo_url: repoLink })
         });
 
         if (!response.ok) {
@@ -35,5 +35,45 @@ export const rajaAgent = async (details) => {
 
     } catch (error) {
         console.error("Failed to run raja agent:", error);
+    }
+}
+
+export const getTickets = async () => {
+    try {
+        const response = await fetch('http://localhost:5000/v1/get-tickets', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        return data;
+
+    } catch (error) {
+        console.error("Failed to fetch tickets:", error);
+    }
+}
+
+export const createTicket = async (ticketData) => {
+    try {
+        const response = await fetch('http://localhost:5000/v1/create-ticket', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(ticketData),
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+    } catch (error) {
+        console.error("Failed to create ticket:", error);
     }
 }
