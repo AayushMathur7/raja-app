@@ -3,6 +3,8 @@ import React, { useContext, useState } from 'react';
 import { TaskContext } from '@/contexts/TaskContext'
 import { StatusType } from '@/enums/StatusType'
 import { rajaAgent } from '@/api/dashboard';
+import { ConvexProvider, ConvexReactClient } from "convex/react";
+
 
 function getStatusText(status) {
     if (status === StatusType.READY_TO_DEPLOY) {

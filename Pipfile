@@ -18,6 +18,7 @@ bs4 = "*"
 python-dotenv = "*"
 openai = "*"
 lark = "*"
+convex = "*"
 
 [dev-packages]
 
