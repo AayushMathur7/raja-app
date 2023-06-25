@@ -1,3 +1,6 @@
+raja-app-main/server/app.py
+
+```python
 import os
 from pprint import pprint
 
@@ -91,5 +94,17 @@ def create_ticket():
     return {}
 
 
+@app.route("/v1/status", methods=["GET"])
+def get_status():
+    # Implement the logic to get the current stage of the workflow and estimated time to completion
+    # Return a JSON response with the current stage and estimated time
+    status = {
+        "current_stage": "Embedding Workflow",
+        "estimated_time": "2 hours",
+    }
+    return jsonify(status)
+
+
 if __name__ == "__main__":
     app.run(port=5000, debug=True)
+```
