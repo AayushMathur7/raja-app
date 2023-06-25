@@ -81,12 +81,27 @@ def load_template_from_file(filepath, variables):
         raise
 
 
+def load_prompt_from_file(filepath, variables):
+    try:
+        with open(filepath, "r") as file:
+            template_str = file.read()
+        return template_str.format(**variables)
+    except Exception as e:
+        print(f"Failed to load template from file: {filepath}")
+        print(f"Error: {e}")
+        raise
+
+
 def run_llm_chain(template_str, **kwargs):
     prompt = PromptTemplate(template=template_str, input_variables=list(kwargs.keys()))
     llm_chain = LLMChain(prompt=prompt, llm=LLM)
     return llm_chain.run(**kwargs)
 
-def
+
+def run_sequential_chain(file, file_paths, template_str, documents, **kwargs):
+    code_name = kwargs.get('name')
+    file[code_name] = run_llm_chain(template_str, **kwargs)
+    return file
 
 
 def raja_agent(req_body):
@@ -99,17 +114,14 @@ def raja_agent(req_body):
         LLM, vector_store, document_description, metadata_field_info, verbose=True
     )
 
-    get_relevant_file_paths = load_template_from_file(
-        "server/prompts/get_relevant_files.txt",
-        ["description", "label", "how_to_reproduce", "acceptance_criteria"],
+    get_relevant_file_paths = load_prompt_from_file(
+        "server/prompts/get_relevant_files.txt", vars(card)
     )
 
-    relevant_file_documents = retriever.get_relevant_documents(get_relevant_file_paths)
+    relevant_documents = retriever.get_relevant_documents(get_relevant_file_paths)
 
-    for document in relevant_file_documents:
-        print(document.metadata["document_id"])
-        # with open("data/content.txt", "w") as f:
-        #     f.write(file.page_content)
+    for documents in relevant_documents:
+        print(documents.metadata["document_id"])
 
     for template_name, variables in TEMPLATE_VARIABLES[card.type].items():
         kwargs = {var: getattr(card, var, "") for var in variables}
@@ -118,7 +130,8 @@ def raja_agent(req_body):
         )
 
         if template_name == card.type:
-            file["new_code"] = run_llm_chain(template_str, **kwargs)
+            # file["new_code"] = run_llm_chain(template_str, **kwargs)
+            file = run_sequential_chain(file, get_relevant_file_paths, template_str, relevant_documents, **kwargs)
         else:
             metadata[template_name] = run_llm_chain(template_str, **kwargs)
 

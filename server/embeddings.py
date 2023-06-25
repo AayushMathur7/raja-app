@@ -31,10 +31,10 @@ pinecone.init(
     environment=PINECONE_ENVIRONMENT,
 )
 vector_store = Pinecone(
-    index=pinecone.Index("raja"),
+    index=pinecone.Index("raja-app"),
     embedding_function=embeddings.embed_query,
     text_key="text",
-    namespace="raja",
+    namespace="raja-app",
 )
 metadata_field_info = [
     AttributeInfo(
@@ -87,8 +87,8 @@ def execute_embedding_workflow(repo_url, folder_path):
     vector_store.from_documents(
         documents=split_documents,
         embedding=embeddings,
-        index_name="raja",
-        namespace="raja",
+        index_name="raja-app",
+        namespace="raja-app",
     )
 
     pd.DataFrame.from_records(corpus_summary).to_csv(
