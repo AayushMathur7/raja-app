@@ -37,12 +37,6 @@ export default function TaskTemplate() {
 
   };
 
-//     const handleSubmit = (event) => {
-//     event.preventDefault();
-//     console.log("Submitting repo link:", repoLink)
-//     initializeRepo(user.primaryEmailAddressId, user.primaryEmailAddress, repoLink).then(r => console.log(r)).catch(err => console.error(err));
-//   }
-
   return (
     <div className="py-12">
         <div>
