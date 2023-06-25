@@ -171,6 +171,12 @@ def generate_code(file, ticket_type, template_name, variables, documents, **kwar
     for document in documents:
         filepath = document.metadata["document_id"]
         print("Generating code for document:", filepath)
+        if not filepath.endswith((".py", ".ts", ".tsx", ".js", ".jsx")):
+            print("Skipping file:", filepath)
+            continue
+        filepath = filepath.split("/")
+        filepath = "/".join(filepath[1:])
+        print(filepath)
         kwargs["current_filepath"] = filepath
         template_str = load_template_from_file(
             TEMPLATE_FILEPATHS[ticket_type][template_name], variables
@@ -242,7 +248,9 @@ def raja_agent(req_body):
                         relevant_documents.remove(document)
                         continue
 
-                    file_objects += f"{file_path} {decoded_content} "
+                    file_objects += (
+                        f"Code for the following {file_path}: \n {decoded_content} "
+                    )
                 else:
                     print(f"No commits found for file: {file_path}")
 
