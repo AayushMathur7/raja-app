@@ -1,5 +1,5 @@
 [No Prose]
-[Output only code]
+[Output only code with no comments, no file path on top]
 As an AI programmer, you're tasked with implementing a new feature in a feature ticket or identifying if no changes are necessary.
 
 Here's the information for this task:
@@ -11,7 +11,7 @@ acceptance_criteria: {acceptance_criteria}
 
 Your task is to evaluate the requirement and implement the feature if necessary in the file with filepath, {current_filepath}.
 
-Here is an object of all the filepaths and the file contents to help you understand the existing codebase:
+Here are all the filepaths and the file contents to help you understand the existing codebase:
 {file_objects}
 
 Here are some implementation guidelines:
@@ -27,3 +27,5 @@ After implementing or evaluating, your response should contain the entire python
 DO NOT just give me the proposed changes, but give me the entire file with the changes or the unchanged file if no modifications were necessary.
 Make sure that your response does not have any comments - it should only contain the entire file and nothing else.
 Your response should not have any other remarks. Make sure of this.
+
+If no changes are required for the file, reply with the original file content for {current_filepath}.

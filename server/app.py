@@ -36,13 +36,19 @@ def initialize_repo():
     user_email = req_data["user_email"]
     repo_url = req_data["repo_url"]
 
-
     try:
         folder_path, zip_url = embeddings.compute_prefix_and_zip_url(repo_url)
         # embeddings.execute_embedding_workflow(zip_url, folder_path)
         repo_owner, repo_name = embeddings.get_repo_info(repo_url)
         client.mutation(
-            "repo:addRepo", {"user_id": user_id, "user_email": user_email, "url": repo_url, "owner": repo_owner, "name": repo_name}
+            "repo:addRepo",
+            {
+                "user_id": user_id,
+                "user_email": user_email,
+                "url": repo_url,
+                "owner": repo_owner,
+                "name": repo_name,
+            },
         )
     except ValueError as e:
         return jsonify(error=str(e)), 400
@@ -54,7 +60,10 @@ def run_raja():
     print("Running Raja")
     req_data = request.get_json()
     print(req_data)
-    pr_url = raja.raja_agent(req_data)
+    try:
+        pr_url = raja.raja_agent(req_data)
+    except Exception as e:
+        return jsonify(error=str(e)), 400
     return jsonify(message="Raja workflow executed successfully", url=pr_url), 200
 
 

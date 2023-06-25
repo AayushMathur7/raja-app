@@ -48,6 +48,7 @@ def load_template_info():
     branch_name_filepath = "server/prompts/pr_branch_template.txt"
     pr_title_filepath = "server/prompts/pr_title_template.txt"
     pr_body_filepath = "server/prompts/pr_body_template.txt"
+    pr_commit_message_filepath = "server/prompts/pr_commit_message_template.txt"
 
     return (
         template_variables,
@@ -56,6 +57,7 @@ def load_template_info():
         branch_name_filepath,
         pr_title_filepath,
         pr_body_filepath,
+        pr_commit_message_filepath,
     )
 
 
@@ -67,6 +69,7 @@ def load_template_info():
     branch_name_filepath,
     pr_title_filepath,
     pr_body_filepath,
+    pr_commit_message_filepath,
 ) = load_template_info()
 
 TEMPLATE_VARIABLES = {
@@ -75,12 +78,14 @@ TEMPLATE_VARIABLES = {
         "branch_name": branch_name_variables,
         "pr_title": pr_variables,
         "pr_body": pr_variables,
+        "pr_commit_message": pr_variables,
     },
     "feature": {
         "feature": template_variables,
         "branch_name": branch_name_variables,
         "pr_title": pr_variables,
         "pr_body": pr_variables,
+        "pr_commit_message": pr_variables,
     },
 }
 
@@ -90,12 +95,14 @@ TEMPLATE_FILEPATHS = {
         "branch_name": branch_name_filepath,
         "pr_title": pr_title_filepath,
         "pr_body": pr_body_filepath,
+        "pr_commit_message": pr_commit_message_filepath,
     },
     "feature": {
         "feature": "server/prompts/tickets/feature_template.txt",
         "branch_name": branch_name_filepath,
         "pr_title": pr_title_filepath,
         "pr_body": pr_body_filepath,
+        "pr_commit_message": pr_commit_message_filepath,
     },
 }
 
@@ -110,6 +117,7 @@ class Card:
     how_to_reproduce: str = ""
     current_filepath: str = ""
     file_objects: str = ""
+    status: str = "Ready to Deploy"
 
     def __post_init__(self):
         self.type = self.type.lower()
@@ -231,28 +239,37 @@ def raja_agent(req_body):
                 if file_path.startswith(repo_name_with_slash):
                     truncated_file_path = file_path.replace(repo_name_with_slash, "", 1)
 
-                print(truncated_file_path)
-                commits = ghapi_client.repos.list_commits(path=truncated_file_path)
+                try:
+                    commits = ghapi_client.repos.list_commits(path=truncated_file_path)
+                except Exception as e:
+                    print(f"Failed to get commits for file: {file_path}")
+                    print(f"Error: {e}")
+                    commits = None
 
                 if commits:
                     latest_commit_sha = commits[0].sha
-                    file_content = ghapi_client.repos.get_content(
-                        path=truncated_file_path, ref=latest_commit_sha
-                    )
-                    decoded_content = base64.b64decode(file_content.content).decode(
-                        "utf-8"
-                    )
-                    num_lines = len(decoded_content.splitlines())
+                    try:
+                        file_content = ghapi_client.repos.get_content(
+                            path=truncated_file_path, ref=latest_commit_sha
+                        )
+                        decoded_content = base64.b64decode(file_content.content).decode(
+                            "utf-8"
+                        )
+                        num_lines = len(decoded_content.splitlines())
 
-                    # Check if the file is too large
-                    if num_lines > 1000:
-                        print(f"File {file_path} is too large, skipping...")
-                        relevant_documents.remove(document)
+                        # Check if the file is too large
+                        if num_lines > 1000:
+                            print(f"File {file_path} is too large, skipping...")
+                            relevant_documents.remove(document)
+                            continue
+
+                        file_objects += (
+                            f"Code for the following {file_path}: \n {decoded_content} "
+                        )
+                    except Exception as e:
+                        print(f"Failed to get file content for file: {file_path}")
+                        print(f"Error: {e}")
                         continue
-
-                    file_objects += (
-                        f"Code for the following {file_path}: \n {decoded_content} "
-                    )
                 else:
                     print(f"No commits found for file: {file_path}")
 
