@@ -8,6 +8,7 @@ from langchain import PromptTemplate
 from langchain.chains import LLMChain
 from langchain.chat_models import ChatOpenAI
 from langchain.retrievers import SelfQueryRetriever
+from langchain.memory import ConversationBufferMemory
 
 # Load environment variables from .env file
 load_dotenv()
@@ -98,9 +99,11 @@ def run_llm_chain(template_str, **kwargs):
     return llm_chain.run(**kwargs)
 
 
-def run_sequential_chain(file, file_paths, template_str, documents, **kwargs):
-    code_name = kwargs.get('name')
-    file[code_name] = run_llm_chain(template_str, **kwargs)
+def generate_code(file, documents, template_str, **kwargs):
+    for document in documents:
+        filepath = document.metadata["document_id"]
+        kwargs['current_filepath'] = filepath
+        file[filepath] = run_llm_chain(template_str,  **kwargs)
     return file
 
 
@@ -120,9 +123,6 @@ def raja_agent(req_body):
 
     relevant_documents = retriever.get_relevant_documents(get_relevant_file_paths)
 
-    for documents in relevant_documents:
-        print(documents.metadata["document_id"])
-
     for template_name, variables in TEMPLATE_VARIABLES[card.type].items():
         kwargs = {var: getattr(card, var, "") for var in variables}
         template_str = load_template_from_file(
@@ -130,8 +130,12 @@ def raja_agent(req_body):
         )
 
         if template_name == card.type:
-            # file["new_code"] = run_llm_chain(template_str, **kwargs)
-            file = run_sequential_chain(file, get_relevant_file_paths, template_str, relevant_documents, **kwargs)
+            file_objects = {}
+            for document in relevant_documents:
+                file_objects[document.metadata["document_id"]] = document.page_content
+
+            kwargs['file_objects'] = file_objects
+            file = generate_code(file, relevant_documents, template_str, **kwargs)
         else:
             metadata[template_name] = run_llm_chain(template_str, **kwargs)
 
