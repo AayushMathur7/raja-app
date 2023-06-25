@@ -1,16 +1,17 @@
 import base64
 import json
 import os
+import re
 from dataclasses import dataclass
 
 from app import client
 from dotenv import load_dotenv
 from embeddings import metadata_field_info, vector_store
 from ghapi.all import GhApi
+from git import create_github_pull_request
 from langchain import PromptTemplate
 from langchain.chains import LLMChain
 from langchain.chat_models import ChatOpenAI
-from langchain.memory import ConversationBufferMemory
 from langchain.retrievers import SelfQueryRetriever
 
 # Load environment variables from .env file
@@ -18,51 +19,83 @@ load_dotenv()
 
 OPEN_AI_KEY = os.getenv("OPEN_AI_KEY", "")
 GH_TOKEN = os.getenv("GH_TOKEN", "")
+RAJA_TOKEN = os.getenv("GH_TOKEN_RAJA", "")
 LLM = ChatOpenAI(
     openai_api_key=OPEN_AI_KEY, model_name="gpt-3.5-turbo-16k-0613", temperature=0.2
 )
 
+
+def load_template_info():
+    template_variables = {
+        "name",
+        "label",
+        "description",
+        "acceptance_criteria",
+        "how_to_reproduce",
+        "current_filepath",
+        "file_objects",
+    }
+
+    branch_name_variables = {"name", "label"}
+    pr_variables = {
+        "name",
+        "label",
+        "description",
+        "how_to_reproduce",
+        "acceptance_criteria",
+    }
+
+    branch_name_filepath = "server/prompts/pr_branch_template.txt"
+    pr_title_filepath = "server/prompts/pr_title_template.txt"
+    pr_body_filepath = "server/prompts/pr_body_template.txt"
+
+    return (
+        template_variables,
+        branch_name_variables,
+        pr_variables,
+        branch_name_filepath,
+        pr_title_filepath,
+        pr_body_filepath,
+    )
+
+
+# Get template info
+(
+    template_variables,
+    branch_name_variables,
+    pr_variables,
+    branch_name_filepath,
+    pr_title_filepath,
+    pr_body_filepath,
+) = load_template_info()
+
 TEMPLATE_VARIABLES = {
     "bug": {
-        "bug": [
-            "name",
-            "label",
-            "description",
-            "acceptance_criteria",
-            "how_to_reproduce",
-            "current_filepath",
-            "file_objects",
-        ],
-        "branch_name": ["name", "label"],
-        "pr_title": [
-            "name",
-            "label",
-            "description",
-            "how_to_reproduce",
-            "acceptance_criteria",
-        ],
-        "pr_body": [
-            "name",
-            "label",
-            "description",
-            "how_to_reproduce",
-            "acceptance_criteria",
-        ],
+        "bug": template_variables,
+        "branch_name": branch_name_variables,
+        "pr_title": pr_variables,
+        "pr_body": pr_variables,
     },
     "feature": {
-        # define variables for feature here
+        "feature": template_variables,
+        "branch_name": branch_name_variables,
+        "pr_title": pr_variables,
+        "pr_body": pr_variables,
     },
 }
 
 TEMPLATE_FILEPATHS = {
     "bug": {
         "bug": "server/prompts/tickets/bug_template.txt",
-        "branch_name": "server/prompts/pr_branch_template.txt",
-        "pr_title": "server/prompts/pr_title_template.txt",
-        "pr_body": "server/prompts/pr_body_template.txt",
+        "branch_name": branch_name_filepath,
+        "pr_title": pr_title_filepath,
+        "pr_body": pr_body_filepath,
     },
     "feature": {
-        # define file paths for feature here
+        "feature": "server/prompts/tickets/feature_template.txt",
+        "branch_name": branch_name_filepath,
+        "pr_title": pr_title_filepath,
+        "pr_body": pr_body_filepath,
     },
 }
 
@@ -78,12 +111,31 @@ class Card:
     current_filepath: str = ""
     file_objects: str = ""
 
+    def __post_init__(self):
+        self.type = self.type.lower()
+        self.name = self.name.lower()
+        self.label = self.label.lower()
+        self.description = self.description.lower()
+        self.acceptance_criteria = self.acceptance_criteria.lower()
+        self.how_to_reproduce = self.how_to_reproduce.lower()
+
 
 def load_template_from_file(filepath, variables):
     try:
         with open(filepath, "r") as file:
             template_str = file.read()
-        return template_str.format(**{var: "{" + var + "}" for var in variables})
+
+        # Find all placeholders in the template string
+        placeholders = re.findall(r"\{(\w+)\}", template_str)
+
+        # Create a dictionary containing only keys that exist in the template string
+        filtered_variables = {
+            key: "{" + key + "}" for key in placeholders if key in variables
+        }
+
+        # Format the template string using the filtered dictionary
+        return template_str.format(**filtered_variables)
+
     except Exception as e:
         print(f"Failed to load template from file: {filepath}")
         print(f"Error: {e}")
@@ -102,9 +154,17 @@ def load_prompt_from_file(filepath, variables):
 
 
 def run_llm_chain(template_str, **kwargs):
-    prompt = PromptTemplate(template=template_str, input_variables=list(kwargs.keys()))
+    # Find all placeholders in the template string
+    placeholders = re.findall(r"\{(\w+)\}", template_str)
+
+    # Filter kwargs to only include keys that exist in the template string
+    filtered_kwargs = {key: kwargs[key] for key in placeholders if key in kwargs}
+
+    prompt = PromptTemplate(
+        template=template_str, input_variables=list(filtered_kwargs.keys())
+    )
     llm_chain = LLMChain(prompt=prompt, llm=LLM)
-    return llm_chain.run(**kwargs)
+    return llm_chain.run(**filtered_kwargs)
 
 
 def generate_code(file, ticket_type, template_name, variables, documents, **kwargs):
@@ -129,9 +189,17 @@ def raja_agent(req_body):
         LLM, vector_store, document_description, metadata_field_info, verbose=True
     )
 
-    get_relevant_file_paths = load_prompt_from_file(
-        "server/prompts/get_relevant_files.txt", vars(card)
-    )
+    # Determine the appropriate file path based on the card type
+    if card.type == "bug":
+        get_relevant_file_path = "server/prompts/get_relevant_files_bug.txt"
+    elif card.type == "feature":
+        get_relevant_file_path = "server/prompts/get_relevant_files_feature.txt"
+    else:
+        raise ValueError(f"Unsupported card type: {card.type}")
+
+    get_relevant_file_paths = load_prompt_from_file(get_relevant_file_path, vars(card))
+
+    print(get_relevant_file_paths)
 
     relevant_documents = retriever.get_relevant_documents(get_relevant_file_paths)
 
@@ -145,6 +213,9 @@ def raja_agent(req_body):
                 repo_name = repo_info["name"]
                 repo_owner = repo_info["owner"]
                 ghapi_client = GhApi(owner=repo_owner, repo=repo_name, token=GH_TOKEN)
+                ghapi_raja_client = GhApi(
+                    owner=repo_owner, repo=repo_name, token=RAJA_TOKEN
+                )
                 file_path = document.metadata["document_id"]
                 print(file_path)
 
@@ -198,5 +269,7 @@ def raja_agent(req_body):
 
     with open("data/file_path.json", "w") as f:
         json.dump(file, f, indent=4)
+
+    create_github_pull_request(ghapi_client, ghapi_raja_client, file, metadata)
 
     return file, metadata

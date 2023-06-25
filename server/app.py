@@ -6,6 +6,7 @@ import raja
 from dotenv import load_dotenv
 from flask import Flask, jsonify, request
 from flask_cors import CORS, cross_origin
+from ghapi.all import GhApi
 
 from convex import ConvexClient
 
@@ -24,6 +25,7 @@ dotenv_path = os.path.join(root_dir, ".env.local")
 load_dotenv(dotenv_path)
 
 client = ConvexClient(os.getenv("NEXT_PUBLIC_CONVEX_URL"))
+GH_TOKEN = os.getenv("GH_TOKEN", "")
 
 
 @app.route("/v1/initialize-repo", methods=["POST"])
@@ -50,6 +52,28 @@ def run_raja():
     print(req_data)
     raja.raja_agent(req_data)
     return jsonify(message="Raja workflow executed successfully"), 200
+
+
+@app.route("/v1/delete-all-except-main", methods=["POST"])
+def delete_all_except_main():
+    req_data = request.get_json()
+    repo_owner = req_data["repo_owner"]
+    repo_name = req_data["repo_name"]
+    ghapi = GhApi(owner=repo_owner, repo=repo_name, token=GH_TOKEN)
+
+    # Get all branches
+    branches = ghapi.repos.list_branches()
+
+    for branch in branches:
+        # Delete the branch if its name is not 'main'
+        if branch.name != "main":
+            try:
+                ghapi.git.delete_ref(ref=f"heads/{branch.name}")
+                print(f"Deleted branch: {branch.name}")
+            except Exception as e:
+                print(f"Error deleting branch {branch.name}: {e}")
+
+    return {}
 
 
 @app.route("/v1/get-ticket", methods=["GET"])
