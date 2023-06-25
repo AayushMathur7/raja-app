@@ -38,7 +38,7 @@ def initialize_repo():
 
     try:
         folder_path, zip_url = embeddings.compute_prefix_and_zip_url(repo_url)
-        # embeddings.execute_embedding_workflow(zip_url, folder_path)
+        embeddings.execute_embedding_workflow(zip_url, folder_path)
         repo_owner, repo_name = embeddings.get_repo_info(repo_url)
         client.mutation(
             "repo:addRepo",

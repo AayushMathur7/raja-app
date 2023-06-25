@@ -11,6 +11,7 @@ export default function Dashboard() {
   const [repoLink, setRepoLink] = useState("");
   const { user } = useUser();
   const { tasks, addTask, initializeTasks, updateTask } = useContext(TaskContext);
+  const [repoIsInitializing, setRepoIsInitializing] = useState(false)
 
   const initialized = useRef(false)
 
@@ -21,7 +22,8 @@ export default function Dashboard() {
   const handleSubmit = (event) => {
     event.preventDefault();
     console.log("Submitting repo link:", repoLink)
-    initializeRepo(user.primaryEmailAddressId, user.primaryEmailAddress, repoLink).then(r => console.log(r)).catch(err => console.error(err));
+    setRepoIsInitializing(true)
+    initializeRepo(user.primaryEmailAddressId, user.primaryEmailAddress, repoLink).then(r => setRepoIsInitializing(false)).catch(err => console.error(err));
   }
 
   return <>
@@ -43,13 +45,27 @@ export default function Dashboard() {
               value={repoLink}
               onChange={e => setRepoLink(e.target.value)}
             />
-             <button
-              type="button"
-              className="rounded-md bg-indigo-50 px-2 py-1 text-sm font-medium text-indigo-600 shadow-sm hover:bg-indigo-100"
-              onClick={handleSubmit}
-            >
-              Initialize repo
-          </button>
+             { repoIsInitializing ?
+                  <button
+                  type="button"
+                  className="bg-white px-2 py-1 text-sm font-medium text-indigo-600 shadow-sm hover:bg-indigo-100"
+                  >
+                    <div
+                      className="ml-7 flex justify-center items-center text-indigo-700 ring-indigo-600 h-4 w-4 animate-spin rounded-full border-2 border-solid border-current border-r-transparent align-[-0.125em] text-primary motion-reduce:animate-[spin_1.5s_linear_infinite]"
+                      role="status">
+                      <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]"></span>
+                    </div>
+                  </button>
+
+             :
+                 <button
+                  type="button"
+                  className="rounded-md bg-indigo-50 px-2 py-1 text-sm font-medium text-indigo-600 shadow-sm hover:bg-indigo-100"
+                  onClick={handleSubmit}
+                  >
+                    Initialize repo
+                  </button>
+            }
           </div>
         </div>
 
