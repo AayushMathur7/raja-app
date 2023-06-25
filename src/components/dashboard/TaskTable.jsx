@@ -48,10 +48,17 @@ export default function TaskTable() {
   const { tasks, addTask, updateTask } = useContext(TaskContext);
   const [pullRequestLink, setPullRequestLink] = useState(null)
 
+<<<<<<< HEAD
+  const handleDeploy = (event, currentTask) => {
+    event.preventDefault();
+    console.log("Deploying Raja for this task:", currentTask.name)
+    rajaAgent(currentTask).then(r => setPullRequestLink(r.message)).catch(err => console.error(err));
+=======
   const handleDeploy = (event, task) => {
     // event.preventDefault();
     console.log("Deploying Raja for this task:", task?.name)
     rajaAgent(task).then(r => setPullRequestLink(r.message)).catch(err => console.error(err));
+>>>>>>> 7d32b61051c4ec555d3904fd336f1669aaeb505e
   }
 
   return (
@@ -95,8 +102,13 @@ export default function TaskTable() {
                           <button
                             type="button"
                             className="rounded-md bg-white px-4 py-2 text-[14px] font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+<<<<<<< HEAD
+                            onClick={(event) => handleDeploy(event, task)}
+                            >
+=======
                             onClick={handleDeploy(task)}
                           >
+>>>>>>> 7d32b61051c4ec555d3904fd336f1669aaeb505e
                                 Deploy
                           </button>
                       </td>

@@ -1,13 +1,14 @@
 import embeddings
 import raja
 from flask import Flask, jsonify, request
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 
 app = Flask("Raja")
-CORS(app)  # This will enable CORS for all routes
+cors = CORS(app)
 
 
 @app.route("/v1/initialize-repo", methods=["POST"])
+@cross_origin()
 def initalize_repo():
     req_data = request.get_json()
     repo_url = req_data["repo_url"]
