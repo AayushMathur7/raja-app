@@ -81,6 +81,17 @@ def load_template_from_file(filepath, variables):
         raise
 
 
+def load_prompt_from_file(filepath, variables):
+    try:
+        with open(filepath, "r") as file:
+            template_str = file.read()
+        return template_str.format(**variables)
+    except Exception as e:
+        print(f"Failed to load template from file: {filepath}")
+        print(f"Error: {e}")
+        raise
+
+
 def run_llm_chain(template_str, **kwargs):
     prompt = PromptTemplate(template=template_str, input_variables=list(kwargs.keys()))
     llm_chain = LLMChain(prompt=prompt, llm=LLM)
@@ -97,17 +108,14 @@ def raja_agent(req_body):
         LLM, vector_store, document_description, metadata_field_info, verbose=True
     )
 
-    get_relevant_file_paths = load_template_from_file(
-        "server/prompts/get_relevant_files.txt",
-        ["description", "label", "how_to_reproduce", "acceptance_criteria"],
+    get_relevant_file_paths = load_prompt_from_file(
+        "server/prompts/get_relevant_files.txt", vars(card)
     )
 
     relevant_file_paths = retriever.get_relevant_documents(get_relevant_file_paths)
 
-    for file in relevant_file_paths:
-        print(file.metadata["document_id"])
-        # with open("data/content.txt", "w") as f:
-        #     f.write(file.page_conent)
+    for relevant_file in relevant_file_paths:
+        print(relevant_file.metadata["document_id"])
 
     for template_name, variables in TEMPLATE_VARIABLES[card.type].items():
         kwargs = {var: getattr(card, var, "") for var in variables}
