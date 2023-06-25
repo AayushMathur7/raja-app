@@ -1,7 +1,7 @@
+import base64
 import json
 import os
-from dataclasses import dataclass, field
-from typing import Dict
+from dataclasses import dataclass
 
 from app import client
 from dotenv import load_dotenv
@@ -76,7 +76,7 @@ class Card:
     acceptance_criteria: str = ""
     how_to_reproduce: str = ""
     current_filepath: str = ""
-    file_objects: Dict = field(default_factory=dict)
+    file_objects: str = ""
 
 
 def load_template_from_file(filepath, variables):
@@ -110,12 +110,12 @@ def run_llm_chain(template_str, **kwargs):
 def generate_code(file, ticket_type, template_name, variables, documents, **kwargs):
     for document in documents:
         filepath = document.metadata["document_id"]
+        print("Generating code for document:", filepath)
         kwargs["current_filepath"] = filepath
         template_str = load_template_from_file(
             TEMPLATE_FILEPATHS[ticket_type][template_name], variables
         )
         file[filepath] = run_llm_chain(template_str, **kwargs)
-    print(file)
     return file
 
 
@@ -139,31 +139,53 @@ def raja_agent(req_body):
         kwargs = {var: getattr(card, var, "") for var in variables}
 
         if template_name == card.type:
-            file_objects = {}
+            file_objects = ""
             for document in relevant_documents:
                 repo_info = client.query("repo:get")[0]
                 repo_name = repo_info["name"]
                 repo_owner = repo_info["owner"]
                 ghapi_client = GhApi(owner=repo_owner, repo=repo_name, token=GH_TOKEN)
                 file_path = document.metadata["document_id"]
+                print(file_path)
 
                 # Remove repository name from the file path if it is there
                 repo_name_with_slash = f"{repo_name}-main/"
                 if file_path.startswith(repo_name_with_slash):
-                    file_path = file_path.replace(repo_name_with_slash, "", 1)
+                    truncated_file_path = file_path.replace(repo_name_with_slash, "", 1)
 
-                commits = ghapi_client.repos.list_commits(path=file_path)
+                commits = ghapi_client.repos.list_commits(path=truncated_file_path)
 
                 if commits:
                     latest_commit_sha = commits[0].sha
-                    print(latest_commit_sha)
-                    file_objects[file_path] = ghapi_client.repos.get_content(
-                        path=file_path, ref=latest_commit_sha
+                    file_content = ghapi_client.repos.get_content(
+                        path=truncated_file_path, ref=latest_commit_sha
                     )
+                    decoded_content = base64.b64decode(file_content.content).decode(
+                        "utf-8"
+                    )
+                    num_lines = len(decoded_content.splitlines())
+
+                    # Check if the file is too large
+                    if num_lines > 1000:
+                        print(f"File {file_path} is too large, skipping...")
+                        relevant_documents.remove(document)
+                        continue
+
+                    file_objects += f"{file_path} {decoded_content} "
                 else:
                     print(f"No commits found for file: {file_path}")
 
             kwargs["file_objects"] = file_objects
+
+            dir_path = os.path.dirname("data/sample_file_objects")
+
+            # Check if the directory exists
+            if not os.path.exists(dir_path):
+                # Create the directory if it does not exist
+                os.makedirs(dir_path)
+
+            with open("data/sample_file_objects", "w") as f:
+                json.dump(file_objects, f, indent=4)
 
             file = generate_code(
                 file, card.type, template_name, variables, relevant_documents, **kwargs
