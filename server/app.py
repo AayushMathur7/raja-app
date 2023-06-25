@@ -36,13 +36,19 @@ def initialize_repo():
     user_email = req_data["user_email"]
     repo_url = req_data["repo_url"]
 
-
     try:
         folder_path, zip_url = embeddings.compute_prefix_and_zip_url(repo_url)
         embeddings.execute_embedding_workflow(zip_url, folder_path)
         repo_owner, repo_name = embeddings.get_repo_info(repo_url)
         client.mutation(
-            "repo:addRepo", {"user_id": user_id, "user_email": user_email, "url": repo_url, "owner": "repo_owner", "name": "repo_name"}
+            "repo:addRepo",
+            {
+                "user_id": user_id,
+                "user_email": user_email,
+                "url": repo_url,
+                "owner": "repo_owner",
+                "name": "repo_name",
+            },
         )
     except ValueError as e:
         return jsonify(error=str(e)), 400
@@ -93,6 +99,17 @@ def create_ticket():
     print(req_data)
     client.mutation("tickets:createTicket", req_data)
     return {}
+
+
+@app.route("/v1/status", methods=["GET"])
+def get_status():
+    # Implement the logic to get the current stage of the workflow and estimated time to completion
+    # Return a JSON response with the current stage and estimated time
+    status = {
+        "current_stage": "Embedding Workflow",
+        "estimated_time": "2 hours",
+    }
+    return jsonify(status)
 
 
 if __name__ == "__main__":
