@@ -144,3 +144,17 @@ def compute_prefix_and_zip_url(repo_url, main_branch="main"):
     )
 
     return folder_prefix, zip_url
+
+
+def get_repo_info(url):
+    # Parse the URL and split the path
+    parsed_url = urlparse(url)
+    path_parts = parsed_url.path.split("/")
+
+    # The repo name is the last part of the path
+    repo_name = path_parts[-1]
+
+    # The owner is the second-to-last part of the path
+    owner = path_parts[-2]
+
+    return owner, repo_name

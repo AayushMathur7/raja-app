@@ -10,6 +10,7 @@
  */
 
 import type { ApiFromModules } from "convex/server";
+import type * as repo from "../repo";
 import type * as tickets from "../tickets";
 
 /**
@@ -21,5 +22,6 @@ import type * as tickets from "../tickets";
  * ```
  */
 export declare const api: ApiFromModules<{
+  repo: typeof repo;
   tickets: typeof tickets;
 }>;

@@ -3,18 +3,21 @@ import os
 from dataclasses import dataclass, field
 from typing import Dict
 
+from app import client
 from dotenv import load_dotenv
 from embeddings import metadata_field_info, vector_store
+from ghapi.all import GhApi
 from langchain import PromptTemplate
 from langchain.chains import LLMChain
 from langchain.chat_models import ChatOpenAI
-from langchain.retrievers import SelfQueryRetriever
 from langchain.memory import ConversationBufferMemory
+from langchain.retrievers import SelfQueryRetriever
 
 # Load environment variables from .env file
 load_dotenv()
 
 OPEN_AI_KEY = os.getenv("OPEN_AI_KEY", "")
+GH_TOKEN = os.getenv("GH_TOKEN", "")
 LLM = ChatOpenAI(
     openai_api_key=OPEN_AI_KEY, model_name="gpt-3.5-turbo-16k-0613", temperature=0.2
 )
@@ -28,7 +31,7 @@ TEMPLATE_VARIABLES = {
             "acceptance_criteria",
             "how_to_reproduce",
             "current_filepath",
-            "file_objects"
+            "file_objects",
         ],
         "branch_name": ["name", "label"],
         "pr_title": [
@@ -107,7 +110,7 @@ def run_llm_chain(template_str, **kwargs):
 def generate_code(file, ticket_type, template_name, variables, documents, **kwargs):
     for document in documents:
         filepath = document.metadata["document_id"]
-        kwargs['current_filepath'] = filepath
+        kwargs["current_filepath"] = filepath
         template_str = load_template_from_file(
             TEMPLATE_FILEPATHS[ticket_type][template_name], variables
         )
@@ -138,12 +141,33 @@ def raja_agent(req_body):
         if template_name == card.type:
             file_objects = {}
             for document in relevant_documents:
-                file_objects[document.metadata["document_id"]] = document.page_content
-                print(document.page_content)
+                repo_info = client.query("repo:get")[0]
+                repo_name = repo_info["name"]
+                repo_owner = repo_info["owner"]
+                ghapi_client = GhApi(owner=repo_owner, repo=repo_name, token=GH_TOKEN)
+                file_path = document.metadata["document_id"]
 
-            kwargs['file_objects'] = file_objects
+                # Remove repository name from the file path if it is there
+                repo_name_with_slash = f"{repo_name}-main/"
+                if file_path.startswith(repo_name_with_slash):
+                    file_path = file_path.replace(repo_name_with_slash, "", 1)
 
-            file = generate_code(file, card.type, template_name, variables, relevant_documents, **kwargs)
+                commits = ghapi_client.repos.list_commits(path=file_path)
+
+                if commits:
+                    latest_commit_sha = commits[0].sha
+                    print(latest_commit_sha)
+                    file_objects[file_path] = ghapi_client.repos.get_content(
+                        path=file_path, ref=latest_commit_sha
+                    )
+                else:
+                    print(f"No commits found for file: {file_path}")
+
+            kwargs["file_objects"] = file_objects
+
+            file = generate_code(
+                file, card.type, template_name, variables, relevant_documents, **kwargs
+            )
         else:
             template_str = load_template_from_file(
                 TEMPLATE_FILEPATHS[card.type][template_name], variables
