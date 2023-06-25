@@ -40,8 +40,9 @@ def create_github_pull_request(ghapi, ghapi_raja, code_change, metadata):
     print("Base sha: ", base_sha)
 
     # Create a new commit that points to this tree and parents are the latest commit on base branch
+    commit_message = metadata["pr_commit_message"]
     new_commit = ghapi_raja.git.create_commit(
-        message="Fix bug", tree=new_tree_sha, parents=[base_sha]
+        message=commit_message, tree=new_tree_sha, parents=[base_sha]
     )
     print("New commit sha: ", new_commit.sha)
 

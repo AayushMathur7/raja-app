@@ -1,0 +1,10 @@
+Based on the following parameters, come up with a suitable commit message for the ticket:
+Here's the information for this task:
+
+name: {name}
+label: {label}
+description: {description}
+how_to_reproduce: {how_to_reproduce}
+acceptance_criteria: {acceptance_criteria}
+
+Your response should only contain the commit message and not any other remarks or headers. Do not include the words "Commit message:", just give the actual commit message. Make sure of this.

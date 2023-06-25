@@ -1,5 +1,5 @@
 [No Prose]
-[Output only code]
+[Output only code with no comments, no file path on top]
 As an AI programmer, you're tasked with debugging a piece of code in a bug ticket.
 
 Here's the information for this task:
@@ -12,7 +12,7 @@ acceptance_criteria: {acceptance_criteria}
 
 Your task is to debug the code and return the corrected code for the file with filepath, {current_filepath}.
 
-Here is an object of all the filepaths and the file contents to help you debug:
+Here are all the filepaths and the file contents to help you understand the existing codebase:
 {file_objects}
 
 Here are some debugging guidelines:
@@ -29,3 +29,5 @@ After debugging, your response should and only should contain the entire correct
 DO NOT just give me the proposed changes, but give me the entire file with the changes.
 Make sure that your response does not have any comments - it should only contain the entire file and nothing else.
 Your response should not have any other remarks. Make sure of this.
+
+If no changes are required for the file, reply with the original file content for {current_filepath}.
