@@ -21,7 +21,6 @@ root_dir = os.path.dirname(current_dir)
 dotenv_path = os.path.join(root_dir, ".env.local")
 
 # load the .env file
-print(dotenv_path)
 load_dotenv(dotenv_path)
 
 client = ConvexClient(os.getenv("NEXT_PUBLIC_CONVEX_URL"))
@@ -35,6 +34,10 @@ def initalize_repo():
     try:
         folder_path, zip_url = embeddings.compute_prefix_and_zip_url(repo_url)
         embeddings.execute_embedding_workflow(zip_url, folder_path)
+        repo_owner, repo_name = embeddings.get_repo_info(repo_url)
+        client.mutation(
+            "repo:addRepo", {"url": repo_url, "owner": repo_owner, "name": repo_name}
+        )
     except ValueError as e:
         return jsonify(error=str(e)), 400
     return jsonify(message="Embedding workflow executed successfully"), 200

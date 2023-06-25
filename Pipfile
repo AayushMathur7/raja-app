@@ -19,6 +19,7 @@ python-dotenv = "*"
 openai = "*"
 lark = "*"
 convex = "*"
+ghapi = "*"
 
 [dev-packages]
 
