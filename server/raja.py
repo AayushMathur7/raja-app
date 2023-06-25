@@ -1,6 +1,7 @@
 import json
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from typing import Dict
 
 from dotenv import load_dotenv
 from embeddings import metadata_field_info, vector_store
@@ -26,6 +27,8 @@ TEMPLATE_VARIABLES = {
             "description",
             "acceptance_criteria",
             "how_to_reproduce",
+            "current_filepath",
+            "file_objects"
         ],
         "branch_name": ["name", "label"],
         "pr_title": [
@@ -69,6 +72,8 @@ class Card:
     description: str = ""
     acceptance_criteria: str = ""
     how_to_reproduce: str = ""
+    current_filepath: str = ""
+    file_objects: Dict = field(default_factory=dict)
 
 
 def load_template_from_file(filepath, variables):
@@ -99,11 +104,15 @@ def run_llm_chain(template_str, **kwargs):
     return llm_chain.run(**kwargs)
 
 
-def generate_code(file, documents, template_str, **kwargs):
+def generate_code(file, ticket_type, template_name, variables, documents, **kwargs):
     for document in documents:
         filepath = document.metadata["document_id"]
         kwargs['current_filepath'] = filepath
-        file[filepath] = run_llm_chain(template_str,  **kwargs)
+        template_str = load_template_from_file(
+            TEMPLATE_FILEPATHS[ticket_type][template_name], variables
+        )
+        file[filepath] = run_llm_chain(template_str, **kwargs)
+    print(file)
     return file
 
 
@@ -125,18 +134,20 @@ def raja_agent(req_body):
 
     for template_name, variables in TEMPLATE_VARIABLES[card.type].items():
         kwargs = {var: getattr(card, var, "") for var in variables}
-        template_str = load_template_from_file(
-            TEMPLATE_FILEPATHS[card.type][template_name], variables
-        )
 
         if template_name == card.type:
             file_objects = {}
             for document in relevant_documents:
                 file_objects[document.metadata["document_id"]] = document.page_content
+                print(document.page_content)
 
             kwargs['file_objects'] = file_objects
-            file = generate_code(file, relevant_documents, template_str, **kwargs)
+
+            file = generate_code(file, card.type, template_name, variables, relevant_documents, **kwargs)
         else:
+            template_str = load_template_from_file(
+                TEMPLATE_FILEPATHS[card.type][template_name], variables
+            )
             metadata[template_name] = run_llm_chain(template_str, **kwargs)
 
     with open("data/file_path.json", "w") as f:
