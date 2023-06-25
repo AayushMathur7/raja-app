@@ -22,7 +22,9 @@ def initalize_repo():
 
 @app.route("/v1/run-raja", methods=["POST"])
 def run_raja():
+    print("Running Raja")
     req_data = request.get_json()
+    print(req_data)
     raja.raja_agent(req_data)
     return jsonify(message="Raja workflow executed successfully"), 200
 

@@ -7,7 +7,6 @@ sample-raja-main/package-lock.json,121110
 sample-raja-main/package.json,329
 sample-raja-main/postcss.config.js,59
 sample-raja-main/prettier.config.js,41
-sample-raja-main/public/favicon.ico,25408
 sample-raja-main/src/components/Button.jsx,154
 sample-raja-main/src/components/Container.jsx,77
 sample-raja-main/src/components/DiamondIcon.jsx,83
@@ -19,12 +18,6 @@ sample-raja-main/src/components/Newsletter.jsx,728
 sample-raja-main/src/components/Schedule.jsx,2903
 sample-raja-main/src/components/Speakers.jsx,3260
 sample-raja-main/src/components/Sponsors.jsx,460
-sample-raja-main/src/images/logos/laravel.svg,2782
-sample-raja-main/src/images/logos/mirage.svg,1829
-sample-raja-main/src/images/logos/statamic.svg,3273
-sample-raja-main/src/images/logos/statickit.svg,3003
-sample-raja-main/src/images/logos/transistor.svg,2114
-sample-raja-main/src/images/logos/tuple.svg,586
 sample-raja-main/src/pages/_app.jsx,43
 sample-raja-main/src/pages/_document.jsx,190
 sample-raja-main/src/pages/index.jsx,277

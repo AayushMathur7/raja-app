@@ -1,0 +1,5 @@
+Considering the description of the task as "{description}",
+the associated label "{label}",
+and the steps to reproduce the issue "{how_to_reproduce}",
+which files in the repository might be most relevant to investigate for making the necessary code changes
+to satisfy the acceptance criteria: "{acceptance_criteria}"?

@@ -4,3 +4,4 @@ node_modules/
 server/.env
 package-lock.json
 .idea/
+server/__pycache__/

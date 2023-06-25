@@ -18,8 +18,6 @@ bs4 = "*"
 python-dotenv = "*"
 openai = "*"
 lark = "*"
-urlopen = "*"
-certifi = "*"
 
 [dev-packages]
 
