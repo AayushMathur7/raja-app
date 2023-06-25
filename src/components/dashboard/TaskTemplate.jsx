@@ -1,6 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { TaskContext } from '@/contexts/TaskContext'
 import { StatusType } from '@/enums/StatusType'
+import {rajaAgent} from "@/api/dashboard";
 
 export default function TaskTemplate() {
 
@@ -29,6 +30,7 @@ export default function TaskTemplate() {
 
        });
        setEmptyInputError(false)
+      rajaAgent(task).then(r => setPullRequestLink(r.message)).catch(err => console.error(err));
   };
 
   return (
