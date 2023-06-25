@@ -11,24 +11,16 @@ export const TaskProvider = ({ children }) => {
   };
 
   const initializeTasks = (newTasks) => {
-    console.log("new tasks", newTasks)
-    // If newTasks is not an array, initialize it as an empty array
     setTasks(newTasks);
   }
 
   // Function to update an existing task
-  const updateTask = (taskIndex, updatedTask) => {
-    setTasks(prevTasks => prevTasks.map((task, index) => {
-      if (index === taskIndex) {
-        return updatedTask;
-      } else {
-        return task;
-      }
-    }));
-  };
+    const updateTasks = (updatedTasks) => {
+      setTasks(updatedTasks);
+    };
 
   return (
-    <TaskContext.Provider value={{ tasks, addTask, initializeTasks, updateTask }}>
+    <TaskContext.Provider value={{ tasks, addTask, initializeTasks, updateTasks }}>
       {children}
     </TaskContext.Provider>
   );

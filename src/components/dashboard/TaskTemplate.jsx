@@ -27,7 +27,8 @@ export default function TaskTemplate() {
          description: description,
          acceptance_criteria: acceptanceCriteria,
          how_to_reproduce: howToReproduce,
-         status: StatusType.READY_TO_DEPLOY
+         status: StatusType.READY_TO_DEPLOY,
+         pr_link: ""
        }
 
        addTask(taskObj);
@@ -37,11 +38,6 @@ export default function TaskTemplate() {
 
   };
 
-//     const handleSubmit = (event) => {
-//     event.preventDefault();
-//     console.log("Submitting repo link:", repoLink)
-//     initializeRepo(user.primaryEmailAddressId, user.primaryEmailAddress, repoLink).then(r => console.log(r)).catch(err => console.error(err));
-//   }
 
   return (
     <div className="py-12">

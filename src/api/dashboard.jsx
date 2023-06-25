@@ -20,18 +20,32 @@ export const initializeRepo = async (userEmailId, userEmail, repoLink) => {
 }
 
 export const rajaAgent = async (details) => {
+  const { type, name, label, description, acceptance_criteria, how_to_reproduce } = details;
+
+  const filteredDetails = {
+    type,
+    name,
+    label,
+    description,
+    acceptance_criteria,
+    how_to_reproduce
+  };
+
     try {
         const response = await fetch('http://localhost:5000/v1/run-raja', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ details: details })
+            body: JSON.stringify(filteredDetails)
         });
 
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
+
+        const url = await response.json();
+        return url;
 
     } catch (error) {
         console.error("Failed to run raja agent:", error);

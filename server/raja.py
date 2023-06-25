@@ -227,9 +227,11 @@ def raja_agent(req_body):
 
                 # Remove repository name from the file path if it is there
                 repo_name_with_slash = f"{repo_name}-main/"
+                truncated_file_path = file_path
                 if file_path.startswith(repo_name_with_slash):
                     truncated_file_path = file_path.replace(repo_name_with_slash, "", 1)
 
+                print(truncated_file_path)
                 commits = ghapi_client.repos.list_commits(path=truncated_file_path)
 
                 if commits:
@@ -278,6 +280,6 @@ def raja_agent(req_body):
     with open("data/file_path.json", "w") as f:
         json.dump(file, f, indent=4)
 
-    create_github_pull_request(ghapi_client, ghapi_raja_client, file, metadata)
+    pull_request_url = create_github_pull_request(ghapi_client, ghapi_raja_client, file, metadata)
 
-    return file, metadata
+    return pull_request_url
