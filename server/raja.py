@@ -86,6 +86,8 @@ def run_llm_chain(template_str, **kwargs):
     llm_chain = LLMChain(prompt=prompt, llm=LLM)
     return llm_chain.run(**kwargs)
 
+def
+
 
 def raja_agent(req_body):
     card = Card(**req_body)
@@ -102,12 +104,12 @@ def raja_agent(req_body):
         ["description", "label", "how_to_reproduce", "acceptance_criteria"],
     )
 
-    relevant_file_paths = retriever.get_relevant_documents(get_relevant_file_paths)
+    relevant_file_documents = retriever.get_relevant_documents(get_relevant_file_paths)
 
-    for file in relevant_file_paths:
-        print(file.metadata["document_id"])
+    for document in relevant_file_documents:
+        print(document.metadata["document_id"])
         # with open("data/content.txt", "w") as f:
-        #     f.write(file.page_conent)
+        #     f.write(file.page_content)
 
     for template_name, variables in TEMPLATE_VARIABLES[card.type].items():
         kwargs = {var: getattr(card, var, "") for var in variables}
