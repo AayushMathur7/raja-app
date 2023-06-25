@@ -2,7 +2,7 @@ import Head from 'next/head'
 import React, { useContext, useState } from 'react';
 import { TaskContext } from '@/contexts/TaskContext'
 import { StatusType } from '@/enums/StatusType'
-import { runRaja } from '@/api/dashboard';
+import { rajaAgent } from '@/api/dashboard';
 
 function getStatusText(status) {
     if (status === StatusType.READY_TO_DEPLOY) {
@@ -48,10 +48,10 @@ export default function TaskTable() {
   const { tasks, addTask, updateTask } = useContext(TaskContext);
   const [pullRequestLink, setPullRequestLink] = useState(null)
 
-  const handleDeploy = (event, task) => {
+  const handleDeploy = (event, currentTask) => {
     event.preventDefault();
-    console.log("Deploying Raja for this task:", task.name)
-    runRaja(task).then(r => setPullRequestLink(r.message)).catch(err => console.error(err));
+    console.log("Deploying Raja for this task:", currentTask.name)
+    rajaAgent(currentTask).then(r => setPullRequestLink(r.message)).catch(err => console.error(err));
   }
 
   return (
@@ -95,7 +95,7 @@ export default function TaskTable() {
                             <button
                             type="button"
                             className="rounded-md bg-white px-4 py-2 text-[14px] font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-                            onClick={handleDeploy(task)}
+                            onClick={(event) => handleDeploy(event, task)}
                             >
                                 Deploy
                           </button>

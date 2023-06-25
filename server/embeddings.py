@@ -6,7 +6,6 @@ from urllib.request import urlopen
 
 import pandas as pd
 import pinecone
-import requests
 import tiktoken
 from dotenv import load_dotenv
 from langchain.chains.query_constructor.schema import AttributeInfo
