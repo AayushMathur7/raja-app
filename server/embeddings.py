@@ -61,7 +61,10 @@ def execute_embedding_workflow(repo_url, folder_path):
             print(file_name)
             if (
                 file_name.endswith("/")
-                or any(f in file_name for f in [".DS_Store", ".gitignore", ".next"])
+                or any(
+                    f in file_name
+                    for f in [".DS_Store", ".gitignore", ".next", ".json"]
+                )
                 or any(
                     file_name.endswith(ext)
                     for ext in [".png", ".jpg", ".jpeg", ".svg", ".ico"]

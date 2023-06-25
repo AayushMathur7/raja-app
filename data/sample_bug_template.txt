@@ -1,5 +1,3 @@
-[No Prose]
-[Output only code]
 As an AI programmer, you're tasked with debugging a piece of code in a bug ticket.
 
 Here's the information for this task:

@@ -1,0 +1,3 @@
+Considering the details of the {type} task described as {description},
+which files in the repository might be most relevant to investigate for making the necessary code changes
+to meet the requirements outlined in the acceptance criteria: {acceptance_criteria}?
