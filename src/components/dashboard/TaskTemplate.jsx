@@ -27,10 +27,10 @@ export default function TaskTemplate() {
          acceptance_criteria: acceptanceCriteria,
          how_to_reproduce: howToReproduce,
          status: StatusType.READY_TO_DEPLOY
-
        });
+
        setEmptyInputError(false)
-      rajaAgent(task).then(r => setPullRequestLink(r.message)).catch(err => console.error(err));
+       rajaAgent(task).then(r => setPullRequestLink(r.message)).catch(err => console.error(err));
   };
 
   return (
