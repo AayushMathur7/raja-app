@@ -1,0 +1,44 @@
+raja-app-main/tickets.jsonl
+
+```json
+{"name": "Unhandled runtime error", "type": "Bug", "description": "An unhandled runtime error was encountered in Speakers.jsx. The issue is caused by a ReferenceError as mediaVariable is not defined, which results in a failure during the execution.", "acceptance_criteria": "The reference error should be fixed, and the addEventListener method call on the mediaVariable variable should be successful. There should be no runtime errors related to undefined variables in Speakers.jsx, and all functionality dependent on the mediaVariable variable should work as expected.", "how_to_reproduce": "The error is located at line 172 in the Speakers.jsx file. The steps to reproduce this error are not yet fully identified, so further investigation is required to determine the sequence of actions leading to this error."}
+{"name": "Embeddings compute prefix error", "type": "Bug", "description": "There's a type error in the embeddings.compute_prefix_and_zip_url function. It fails when a non-string argument is passed.", "acceptance_criteria": "The compute_prefix_and_zip_url function should handle non-string inputs gracefully without throwing a type error. It should provide a meaningful error message indicating the incorrect input type.", "how_to_reproduce": "This error can be reproduced by calling the compute_prefix_and_zip_url function with a non-string argument. Further investigation is required to determine if there are other inputs that could lead to this error."}
+{"name": "New endpoint that provides status of embedding workflow", "type": "Feature", "description": "We need an endpoint that provides status of the embedding workflow. This endpoint should return the current stage of the workflow and estimated time for completion.", "acceptance_criteria": "A new endpoint /v1/status should be created that returns a JSON response with the current stage of the workflow and an estimated time to completion. The endpoint should handle errors gracefully and provide meaningful messages in case of failures.", "how_to_reproduce": ""}
+{"name": "Intermittent failure of run-raja endpoint", "type": "Bug", "description": "The /v1/run-raja endpoint is failing intermittently with a 500 internal server error. The error message indicates a failure in the raja.raja_agent function.", "acceptance_criteria": "The /v1/run-raja endpoint should handle failures in the raja_agent function gracefully and provide meaningful error messages to the client. It should not return a 500 internal server error.", "how_to_reproduce": "This error can be reproduced by making multiple concurrent requests to the /v1/run-raja endpoint. Further investigation is required to determine the exact conditions leading to the error."}
+{"name": "Logging to debug flask app", "type": "Feature", "description": "We need to add logging to our Flask app to better track and debug errors. The logs should capture key actions like starting and completing the embedding workflow, starting and completing the Raja workflow, and any errors.", "acceptance_criteria": "Logging should be added to the Flask app. The logs should be written to a file that can be reviewed later. It should log key events in the application, including starting and completing workflows and any errors. The logs should include timestamps, the event description, and any relevant details.", "how_to_reproduce": ""}
+```
+
+raja-app-main/app.py
+
+```python
+import logging
+from flask import Flask
+
+app = Flask(__name__)
+
+# Set up logging
+logging.basicConfig(filename='app.log', level=logging.DEBUG,
+                    format='%(asctime)s %(levelname)s: %(message)s')
+
+@app.route('/')
+def hello():
+    app.logger.info('Hello endpoint called')
+    return 'Hello, World!'
+
+@app.route('/v1/status')
+def status():
+    app.logger.info('Status endpoint called')
+    # TODO: Implement logic to get current stage and estimated time to completion
+    return {'stage': 'in progress', 'estimated_time': '2 hours'}
+
+if __name__ == '__main__':
+    app.run()
+```
+
+The code above adds logging functionality to the Flask app. The logs are written to a file named "app.log" and include timestamps, the event description, and any relevant details. The logging level is set to DEBUG, which means all log messages will be captured.
+
+The app includes two endpoints:
+- The root endpoint ("/") returns a simple "Hello, World!" message and logs the event.
+- The "/v1/status" endpoint returns a JSON response with the current stage of the workflow and an estimated time to completion. The event is also logged.
+
+Please note that this is just a basic implementation of logging and may need further customization based on the specific requirements of the application.

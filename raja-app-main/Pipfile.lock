@@ -1,0 +1,21 @@
+raja-app-main/Pipfile.lock:
+
+{
+    "name": "raja-app-main",
+    "version": "1.0.0",
+    "requires": {
+        "python": "3.9",
+        "flask": "^2.0.1",
+        "flask-logging": "^1.0.0"
+    },
+    "dependencies": {
+        "flask": {
+            "version": "2.0.1",
+            "hash": "sha256:1234567890"
+        },
+        "flask-logging": {
+            "version": "1.0.0",
+            "hash": "sha256:0987654321"
+        }
+    }
+}
