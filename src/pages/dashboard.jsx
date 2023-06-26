@@ -6,6 +6,7 @@ import { useState, useContext, useRef, useEffect } from "react";
 import { ClerkProvider, UserButton, SignedIn, SignedOut, SignIn } from '@clerk/nextjs'
 import { useUser } from "@clerk/clerk-react";
 import { TaskContext } from '@/contexts/TaskContext'
+import { Logo } from '@/components/Logo'
 
 export default function Dashboard() {
   const [repoLink, setRepoLink] = useState("");
@@ -28,10 +29,13 @@ export default function Dashboard() {
 
   return <>
     <SignedIn>
+    <div className="absolute left-0 p-8">
+            <Logo className="h-10 w-auto" />
+        </div>
         <div className="absolute right-0 p-8">
             <UserButton />
         </div>
-        <div className="m-32 mt-20 -mb-12">
+        <div className="m-32 mt-32 -mb-20">
           <label htmlFor="github_repo_link" className="block text-sm font-medium leading-6 text-gray-900">
             Github Repo Link
           </label>
