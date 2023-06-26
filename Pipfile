@@ -23,6 +23,7 @@ ghapi = "*"
 gunicorn = "*"
 celery = "*"
 app = "*"
+amqp = "*"
 
 [dev-packages]
 
