@@ -17,7 +17,7 @@ cors = CORS(app)
 celery = Celery(
     app.name,
     broker=os.environ["CLOUDAMQP_URL"],
-    backend=os.environ["CELERY_RESULT_BACKEND"],
+    backend=os.environ["CLOUDAMQP_URL"],
 )
 
 # get the directory of the current script
