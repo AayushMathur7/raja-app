@@ -102,9 +102,6 @@ def execute_embedding_workflow(repo_url, folder_path):
         namespace="raja-app",
     )
 
-    pd.DataFrame.from_records(corpus_summary).to_csv(
-        "data/corpus_summary.csv", index=False
-    )
     print("Embedding workflow executed successfully")
     return {}
 
