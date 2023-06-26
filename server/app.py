@@ -60,10 +60,7 @@ def run_raja():
     print("Running Raja")
     req_data = request.get_json()
     print(req_data)
-    try:
-        pr_url = raja.raja_agent(req_data)
-    except Exception as e:
-        return jsonify(error=str(e)), 400
+    pr_url = raja.raja_agent(req_data)
     return jsonify(message="Raja workflow executed successfully", url=pr_url), 200
 
 

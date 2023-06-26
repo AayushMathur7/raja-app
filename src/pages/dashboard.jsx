@@ -48,7 +48,7 @@ export default function Dashboard() {
              { repoIsInitializing ?
                   <button
                   type="button"
-                  className="bg-white px-2 py-1 text-sm font-medium text-indigo-600 shadow-sm hover:bg-indigo-100"
+                  className="bg-white px-2 py-1 text-sm font-medium text-indigo-600"
                   >
                     <div
                       className="ml-7 flex justify-center items-center text-indigo-700 ring-indigo-600 h-4 w-4 animate-spin rounded-full border-2 border-solid border-current border-r-transparent align-[-0.125em] text-primary motion-reduce:animate-[spin_1.5s_linear_infinite]"
