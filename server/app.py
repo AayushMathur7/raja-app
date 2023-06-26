@@ -14,7 +14,11 @@ app = Flask("Raja")
 cors = CORS(app)
 
 # Initialize Celery
-celery = Celery(app.name, broker=os.environ["CLOUDAMQP_URL"])
+celery = Celery(
+    app.name,
+    broker=os.environ["CLOUDAMQP_URL"],
+    backend=os.environ["CELERY_RESULT_BACKEND"],
+)
 
 # get the directory of the current script
 current_dir = os.path.dirname(os.path.abspath(__file__))
