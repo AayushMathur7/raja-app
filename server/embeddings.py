@@ -14,8 +14,16 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import Pinecone
 from tqdm import tqdm
 
-# Load environment variables from .env file
-load_dotenv()
+# get the directory of the current script
+current_dir = os.path.dirname(os.path.abspath(__file__))
+
+# go up one level to get the root directory
+root_dir = os.path.dirname(current_dir)
+
+dotenv_path = os.path.join(root_dir, ".env.local")
+
+# load the .env file
+load_dotenv(dotenv_path)
 
 GH_TOKEN = os.environ.get("GH_TOKEN", "")
 PINECONE_API_KEY = os.environ.get("PINECONE_API_KEY", "")
