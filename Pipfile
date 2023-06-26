@@ -24,6 +24,7 @@ gunicorn = "*"
 celery = "*"
 app = "*"
 amqp = "*"
+redis = "*"
 
 [dev-packages]
 
