@@ -1,11 +1,11 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "f45c189098f8f4d7be19def27c303c9d8e8a4da60eef42f40857b13aff4a8e93"
+            "sha256": "d67d7cf93c714aef0c8ea9e3f8a586f69109a1d36ec0534e88643b90b92e6db0"
         },
         "pipfile-spec": 6,
         "requires": {
-            "python_version": "3.9"
+            "python_version": "3.8"
         },
         "sources": [
             {
@@ -485,11 +485,11 @@
         },
         "langchain": {
             "hashes": [
-                "sha256:3daf5e598562b119e1b8621a5d90b9836fcc2543c642026f988d62c492abb946",
-                "sha256:64f0148f469606666fa113e002e749744c3c38dea9c0e9622c11201d696ec3bb"
+                "sha256:a6b261f3be941eeac2d9b37fbf8996fa4279ef724f064e8c90813046126da85b",
+                "sha256:af9587c2eb317a6e33123f8a4ee8ccd8685cfab62359ea4fec52c962d9646acf"
             ],
             "index": "pypi",
-            "version": "==0.0.214"
+            "version": "==0.0.215"
         },
         "langchainplus-sdk": {
             "hashes": [
