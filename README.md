@@ -1,35 +1,49 @@
-# Salient
+# Raja AI
 
-Salient is a [Tailwind UI](https://tailwindui.com) site template built using [Tailwind CSS](https://tailwindcss.com) and [Next.js](https://nextjs.org).
+Raja AI is your newest team member for your software engineering project - fast, reliable, and cost-efficient. It leverages AI to comprehend your entire codebase and makes changes based on given engineering tickets. It generates relevant code and proactively submits a pull request, ready for human review and approval.
 
-## Getting started
+## Table of Contents
+1. [Installation](#Installation)
+2. [Usage](#Usage)
+3. [Features](#Features)
+4. [Contribution](#Contribution)
+5. [Contact](#Contact)
 
-To get started with this template, first install the npm dependencies:
+## Installation
+
+To get the application running, you need to setup both the front-end and back-end environments.
+
+### Backend Setup
+
+You can setup the backend Flask application using pipenv. From the root directory of the project, run the following commands:
 
 ```bash
-npm install
+pipenv install
+pipenv shell
+cd raja-app
+python3 server/app.py
 ```
 
-Next, run the development server:
+### Frontend Setup
 
 ```bash
+cd raja-app
+npm install
 npm run dev
 ```
 
-Finally, open [http://localhost:3000](http://localhost:3000) in your browser to view the website.
+### Usage
+With the server running, you can navigate to localhost:5000 (for backend) and localhost:3000 (for frontend) on your browser to access and use the Raja AI application.
 
-## Customizing
+### Features
+Raja AI offers the following features:
 
-You can start editing this template by modifying the files in the `/src` folder. The site will auto-update as you edit these files.
+- Interprets engineering tickets and generates relevant code
+- Makes changes to the codebase based on ticket details
+- Submits a pull request for human review
 
-## License
+### Contact
+If you have any queries or issues to report, please create an issue in the GitHub repository.
 
-This site template is a commercial product and is licensed under the [Tailwind UI license](https://tailwindui.com/license).
-
-## Learn more
-
-To learn more about the technologies used in this site template, see the following resources:
-
-- [Tailwind CSS](https://tailwindcss.com/docs) - the official Tailwind CSS documentation
-- [Next.js](https://nextjs.org/docs) - the official Next.js documentation
-- [Headless UI](https://headlessui.dev) - the official Headless UI documentation
+### License
+Raja AI is licensed under the MIT license. For more information, see the LICENSE file in the root directory.

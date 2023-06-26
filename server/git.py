@@ -1,3 +1,6 @@
+import hashlib
+
+
 def create_github_pull_request(ghapi, ghapi_raja, code_change, metadata):
     # Step 1: Create a new branch
     # Get SHA of the latest commit on base branch
@@ -47,7 +50,18 @@ def create_github_pull_request(ghapi, ghapi_raja, code_change, metadata):
     print("New commit sha: ", new_commit.sha)
 
     # Get the reference
-    new_branch = ghapi.git.get_ref(ref=f"heads/{new_branch_name}")
+    try:
+        new_branch = ghapi.git.get_ref(ref=f"heads/{new_branch_name}")
+    except Exception as e:
+        print("Branch name already exists. Creating new branch name...")
+
+        # Create a new hash of the branch name using SHA-256
+        new_hash = hashlib.sha256(new_branch_name.encode("utf-8"))
+        # Get the first 8 characters of the hex digest
+        short_hash = new_hash.hexdigest()[:8]
+
+        new_branch_name = f"{new_branch_name}_{short_hash}"
+        new_branch = ghapi.git.get_ref(ref=f"heads/{new_branch_name}")
     print(
         f"New branch {new_branch_name} state after new commit: {new_branch.object.sha}"
     )
