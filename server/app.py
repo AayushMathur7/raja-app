@@ -64,7 +64,7 @@ def run_raja():
     req_data = request.get_json()
     print(req_data)
     try:
-        task = raja.raja_agent.delay(req_data)  # This will now run as a Celery task
+        task = run_raja_task.delay(req_data)  # This will now run as a Celery task
         return (
             jsonify(message="Raja workflow initiated successfully", task_id=task.id),
             200,
@@ -74,7 +74,7 @@ def run_raja():
 
 
 @celery.task
-def raja_agent(req_data):
+def run_raja_task(req_data):
     pr_url = raja.raja_agent(req_data)
     return pr_url
 
