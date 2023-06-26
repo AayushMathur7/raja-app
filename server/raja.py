@@ -4,7 +4,6 @@ import os
 import re
 from dataclasses import dataclass
 
-from app import client
 from dotenv import load_dotenv
 from embeddings import metadata_field_info, vector_store
 from ghapi.all import GhApi
@@ -14,8 +13,20 @@ from langchain.chains import LLMChain
 from langchain.chat_models import ChatOpenAI
 from langchain.retrievers import SelfQueryRetriever
 
-# Load environment variables from .env file
-load_dotenv()
+from convex import ConvexClient
+
+# get the directory of the current script
+current_dir = os.path.dirname(os.path.abspath(__file__))
+
+# go up one level to get the root directory
+root_dir = os.path.dirname(current_dir)
+
+dotenv_path = os.path.join(root_dir, ".env.local")
+
+# load the .env file
+load_dotenv(dotenv_path)
+
+client = ConvexClient(os.getenv("NEXT_PUBLIC_CONVEX_URL"))
 
 OPEN_AI_KEY = os.getenv("OPEN_AI_KEY", "")
 GH_TOKEN = os.getenv("GH_TOKEN", "")
@@ -297,6 +308,8 @@ def raja_agent(req_body):
     with open("data/file_path.json", "w") as f:
         json.dump(file, f, indent=4)
 
-    pull_request_url = create_github_pull_request(ghapi_client, ghapi_raja_client, file, metadata)
+    pull_request_url = create_github_pull_request(
+        ghapi_client, ghapi_raja_client, file, metadata
+    )
 
     return pull_request_url
