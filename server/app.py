@@ -1,6 +1,5 @@
 import os
 
-import app as app
 import embeddings
 import raja
 from celery import Celery
