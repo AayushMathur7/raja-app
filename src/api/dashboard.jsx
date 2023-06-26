@@ -44,11 +44,32 @@ export const rajaAgent = async (details) => {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        const url = await response.json();
-        return url;
+        const data = await response.json();
+        return data.task_id;
 
     } catch (error) {
         console.error("Failed to run raja agent:", error);
+    }
+}
+
+export const checkRajaTaskStatus = async (taskId) => {
+    try {
+        const response = await fetch(`http://localhost:5000/v1/tasks/${taskId}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        return data;
+
+    } catch (error) {
+        console.error("Failed to check task status:", error);
     }
 }
 

@@ -64,10 +64,28 @@ def run_raja():
     req_data = request.get_json()
     print(req_data)
     try:
-        pr_url = raja.raja_agent(req_data)
-        return jsonify(message="Raja workflow executed successfully", url=pr_url), 200
+        task = raja.raja_agent.delay(req_data)  # This will now run as a Celery task
+        return (
+            jsonify(message="Raja workflow initiated successfully", task_id=task.id),
+            200,
+        )
     except Exception as e:
         return jsonify(error=str(e)), 400
+
+
+@celery.task
+def raja_agent(req_data):
+    pr_url = raja.raja_agent(req_data)
+    return pr_url
+
+
+@app.route("/v1/tasks/<task_id>", methods=["GET"])
+def get_task_status(task_id):
+    task = celery.AsyncResult(task_id)
+    response = {"task_id": task.id, "status": task.status}
+    if task.status == "SUCCESS":
+        response["result"] = task.result  # This is where you could return the PR URL
+    return jsonify(response)
 
 
 @app.route("/v1/delete-all-except-main", methods=["POST"])
