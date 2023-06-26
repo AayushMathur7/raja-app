@@ -60,8 +60,11 @@ def run_raja():
     print("Running Raja")
     req_data = request.get_json()
     print(req_data)
-    pr_url = raja.raja_agent(req_data)
-    return jsonify(message="Raja workflow executed successfully", url=pr_url), 200
+    try:
+        pr_url = raja.raja_agent(req_data)
+        return jsonify(message="Raja workflow executed successfully", url=pr_url), 200
+    except Exception as e:
+        return jsonify(error=str(e)), 400
 
 
 @app.route("/v1/delete-all-except-main", methods=["POST"])
