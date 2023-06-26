@@ -5,35 +5,23 @@ import clsx from 'clsx'
 
 import { Container } from '@/components/Container'
 import backgroundImage from '@/images/background-features.jpg'
-import screenshotExpenses from '@/images/screenshots/expenses.png'
-import screenshotPayroll from '@/images/screenshots/payroll.png'
-import screenshotReporting from '@/images/screenshots/reporting.png'
-import screenshotVatReturns from '@/images/screenshots/vat-returns.png'
+import createTrello from '@/images/screenshots/create-trello.png'
+import generatePR from '@/images/screenshots/generated-pr.png'
+import manageDashboard from '@/images/screenshots/manage-dashboard.png'
+import dashboard from '@/images/screenshots/dashboard.png'
 
 const features = [
   {
-    title: 'Create a Trello Card',
+    title: 'Create a task and deploy Raja agent',
     description:
-      "Add a card to your 'To-Do' list, detailing the feature, error specifics, reproduction steps, relevant commit permalink, and acceptance criteria. Label as a Bug or Feature and assign the card to Raja.",
-    image: screenshotPayroll,
-  },
-  {
-    title: 'Watch the LLM do its magic',
-    description:
-      "Raja will investigate the bug, generate a solution for it powered by gpt-3.5-turbo-16k-0613 model.",
-    image: screenshotExpenses,
+      "Raja will investigate the bug or feature and generate a solution for it - powered by gpt-3.5-turbo-16k-0613 model.",
+    image: dashboard,
   },
   {
     title: 'Review PR submitted by Raja',
     description:
       "Raja will submit a Pull Request for review. Reviewers can either approve the PR or suggest modifications, upon which Raja will diligently refine the solution.",
-    image: screenshotVatReturns,
-  },
-  {
-    title: 'Manage progress on the dashboard',
-    description:
-      'Assign Raja new tickets and manage progress on the dashboard.',
-    image: screenshotReporting,
+    image: generatePR,
   },
 ]
 
@@ -133,7 +121,7 @@ export function PrimaryFeatures() {
                         {feature.description}
                       </p>
                     </div>
-                    <div className="mt-10 w-[45rem] overflow-hidden rounded-xl bg-slate-50 shadow-xl shadow-blue-900/20 sm:w-auto lg:mt-0 lg:w-[67.8125rem]">
+                    <div className="mt-10 w-[45rem] max-w-[60rem] overflow-hidden rounded-xl bg-slate-50 shadow-xl shadow-blue-900/20 sm:w-auto lg:mt-0 lg:w-[67.8125rem]">
                       <Image
                         className="w-full"
                         src={feature.image}

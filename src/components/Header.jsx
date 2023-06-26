@@ -96,10 +96,9 @@ export function Header() {
       <Container>
         <nav className="relative z-50 flex justify-between">
           <div className="flex items-center font-semibold md:gap-x-12 text-blue-600 text-md">
-{/* //             <Link href="#" aria-label="Home"> */}
-{/* //               <Logo className="h-10 w-auto" /> */}
-{/* //             </Link> */}
-            Raja
+             <Link href="#" aria-label="Home">
+               <Logo className="h-10 w-auto" />
+             </Link>
             <div className="hidden md:flex md:gap-x-6">
             </div>
           </div>
