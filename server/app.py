@@ -1,8 +1,9 @@
 import os
-from pprint import pprint
 
+import app as app
 import embeddings
 import raja
+from celery import Celery
 from dotenv import load_dotenv
 from flask import Flask, jsonify, request
 from flask_cors import CORS, cross_origin
@@ -12,6 +13,9 @@ from convex import ConvexClient
 
 app = Flask("Raja")
 cors = CORS(app)
+
+# Initialize Celery
+celery = Celery(app.name, broker="pyamqp://guest@localhost//")
 
 # get the directory of the current script
 current_dir = os.path.dirname(os.path.abspath(__file__))

@@ -21,6 +21,8 @@ lark = "*"
 convex = "*"
 ghapi = "*"
 gunicorn = "*"
+celery = "*"
+app = "*"
 
 [dev-packages]
 
