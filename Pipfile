@@ -20,8 +20,11 @@ openai = "*"
 lark = "*"
 convex = "*"
 ghapi = "*"
+gunicorn = "*"
+celery = "*"
+app = "*"
 
 [dev-packages]
 
 [requires]
-python_version = "3.9"
+python_version = "3.11.4"

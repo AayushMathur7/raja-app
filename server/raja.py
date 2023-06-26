@@ -1,10 +1,8 @@
 import base64
-import json
 import os
 import re
 from dataclasses import dataclass
 
-from app import client
 from dotenv import load_dotenv
 from embeddings import metadata_field_info, vector_store
 from ghapi.all import GhApi
@@ -14,8 +12,20 @@ from langchain.chains import LLMChain
 from langchain.chat_models import ChatOpenAI
 from langchain.retrievers import SelfQueryRetriever
 
-# Load environment variables from .env file
-load_dotenv()
+from convex import ConvexClient
+
+# get the directory of the current script
+current_dir = os.path.dirname(os.path.abspath(__file__))
+
+# go up one level to get the root directory
+root_dir = os.path.dirname(current_dir)
+
+dotenv_path = os.path.join(root_dir, ".env.local")
+
+# load the .env file
+load_dotenv(dotenv_path)
+
+client = ConvexClient(os.getenv("NEXT_PUBLIC_CONVEX_URL"))
 
 OPEN_AI_KEY = os.getenv("OPEN_AI_KEY", "")
 GH_TOKEN = os.getenv("GH_TOKEN", "")
@@ -45,10 +55,10 @@ def load_template_info():
         "acceptance_criteria",
     }
 
-    branch_name_filepath = "server/prompts/pr_branch_template.txt"
-    pr_title_filepath = "server/prompts/pr_title_template.txt"
-    pr_body_filepath = "server/prompts/pr_body_template.txt"
-    pr_commit_message_filepath = "server/prompts/pr_commit_message_template.txt"
+    branch_name_filepath = "prompts/pr_branch_template.txt"
+    pr_title_filepath = "prompts/pr_title_template.txt"
+    pr_body_filepath = "prompts/pr_body_template.txt"
+    pr_commit_message_filepath = "prompts/pr_commit_message_template.txt"
 
     return (
         template_variables,
@@ -91,14 +101,14 @@ TEMPLATE_VARIABLES = {
 
 TEMPLATE_FILEPATHS = {
     "bug": {
-        "bug": "server/prompts/tickets/bug_template.txt",
+        "bug": "prompts/tickets/bug_template.txt",
         "branch_name": branch_name_filepath,
         "pr_title": pr_title_filepath,
         "pr_body": pr_body_filepath,
         "pr_commit_message": pr_commit_message_filepath,
     },
     "feature": {
-        "feature": "server/prompts/tickets/feature_template.txt",
+        "feature": "prompts/tickets/feature_template.txt",
         "branch_name": branch_name_filepath,
         "pr_title": pr_title_filepath,
         "pr_body": pr_body_filepath,
@@ -205,9 +215,9 @@ def raja_agent(req_body):
 
     # Determine the appropriate file path based on the card type
     if card.type == "bug":
-        get_relevant_file_path = "server/prompts/get_relevant_files_bug.txt"
+        get_relevant_file_path = "prompts/get_relevant_files_bug.txt"
     elif card.type == "feature":
-        get_relevant_file_path = "server/prompts/get_relevant_files_feature.txt"
+        get_relevant_file_path = "prompts/get_relevant_files_feature.txt"
     else:
         raise ValueError(f"Unsupported card type: {card.type}")
 
@@ -275,16 +285,6 @@ def raja_agent(req_body):
 
             kwargs["file_objects"] = file_objects
 
-            dir_path = os.path.dirname("data/sample_file_objects")
-
-            # Check if the directory exists
-            if not os.path.exists(dir_path):
-                # Create the directory if it does not exist
-                os.makedirs(dir_path)
-
-            with open("data/sample_file_objects", "w") as f:
-                json.dump(file_objects, f, indent=4)
-
             file = generate_code(
                 file, card.type, template_name, variables, relevant_documents, **kwargs
             )
@@ -294,9 +294,8 @@ def raja_agent(req_body):
             )
             metadata[template_name] = run_llm_chain(template_str, **kwargs)
 
-    with open("data/file_path.json", "w") as f:
-        json.dump(file, f, indent=4)
-
-    pull_request_url = create_github_pull_request(ghapi_client, ghapi_raja_client, file, metadata)
+    pull_request_url = create_github_pull_request(
+        ghapi_client, ghapi_raja_client, file, metadata
+    )
 
     return pull_request_url

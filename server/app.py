@@ -1,8 +1,8 @@
 import os
-from pprint import pprint
 
 import embeddings
 import raja
+from celery import Celery
 from dotenv import load_dotenv
 from flask import Flask, jsonify, request
 from flask_cors import CORS, cross_origin
@@ -12,6 +12,9 @@ from convex import ConvexClient
 
 app = Flask("Raja")
 cors = CORS(app)
+
+# Initialize Celery
+celery = Celery(app.name, broker=os.environ["CLOUDAMQP_URL"])
 
 # get the directory of the current script
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -60,8 +63,11 @@ def run_raja():
     print("Running Raja")
     req_data = request.get_json()
     print(req_data)
-    pr_url = raja.raja_agent(req_data)
-    return jsonify(message="Raja workflow executed successfully", url=pr_url), 200
+    try:
+        pr_url = raja.raja_agent(req_data)
+        return jsonify(message="Raja workflow executed successfully", url=pr_url), 200
+    except Exception as e:
+        return jsonify(error=str(e)), 400
 
 
 @app.route("/v1/delete-all-except-main", methods=["POST"])

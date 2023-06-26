@@ -20,16 +20,16 @@ export const initializeRepo = async (userEmailId, userEmail, repoLink) => {
 }
 
 export const rajaAgent = async (details) => {
-  const { type, name, label, description, acceptance_criteria, how_to_reproduce } = details;
+    const { type, name, label, description, acceptance_criteria, how_to_reproduce } = details;
 
-  const filteredDetails = {
-    type,
-    name,
-    label,
-    description,
-    acceptance_criteria,
-    how_to_reproduce
-  };
+    const filteredDetails = {
+        type,
+        name,
+        label,
+        description,
+        acceptance_criteria,
+        how_to_reproduce
+    };
 
     try {
         const response = await fetch('http://localhost:5000/v1/run-raja', {
