@@ -45,7 +45,6 @@ export default function TaskTable() {
 
         return <span className={`inline-flex items-center rounded-md gap-2 px-2 py-1 text-xs font-medium ring-1 ring-inset ${statusClass}`}>
             {getStatusText(status)}
-{/*             {getLoader(status)} */}
         </span>
     }
 
@@ -76,7 +75,8 @@ export default function TaskTable() {
             </button>
       }
     }
-  const handleDeploy = (event, taskToUpdate) => {
+
+    const handleDeploy = (event, taskToUpdate) => {
       event.preventDefault();
 
       let updatedTasks = tasks.map(task =>
@@ -84,21 +84,37 @@ export default function TaskTable() {
           ? { ...task, status: StatusType.IN_PROGRESS }
           : task
       );
+
       updateTasks(updatedTasks);
 
       console.log("Deploying Raja for this task:", taskToUpdate?.name);
 
       rajaAgent(taskToUpdate)
-        .then(r => {
-          updatedTasks = updatedTasks.map(task =>
-            task.name === taskToUpdate.name
-              ? { ...task, status: StatusType.PR_READY_FOR_REVIEW, pr_link: r.url }
-              : task
-          );
-          updateTasks(updatedTasks);
+        .then(taskId => {
+          // Poll checkRajaTaskStatus every 5 seconds until task is done
+          const intervalId = setInterval(() => {
+            checkRajaTaskStatus(taskId)
+              .then(data => {
+                if (data.status === 'SUCCESS') {
+                  clearInterval(intervalId); // stop polling when the task is done
+                  updatedTasks = updatedTasks.map(task =>
+                    task.name === taskToUpdate.name
+                      ? { ...task, status: StatusType.PR_READY_FOR_REVIEW, pr_link: data.result }
+                      : task
+                  );
+                  updateTasks(updatedTasks);
+                }
+              })
+              .catch(err => {
+                console.error(err);
+                clearInterval(intervalId); // stop polling when there's an error
+              });
+          }, 5000); // poll every 5 seconds
         })
         .catch(err => console.error(err));
-  }
+    };
+
+
 
 
   return (
