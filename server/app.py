@@ -1,4 +1,5 @@
 import os
+import logging
 
 import embeddings
 import raja
@@ -34,6 +35,9 @@ load_dotenv(dotenv_path)
 client = ConvexClient(os.getenv("NEXT_PUBLIC_CONVEX_URL"))
 GH_TOKEN = os.getenv("GH_TOKEN", "")
 
+# Configure logging
+logging.basicConfig(filename='app.log', level=logging.DEBUG,
+                    format='%(asctime)s %(levelname)s %(message)s')
 
 @app.route("/v1/initialize-repo", methods=["POST"])
 @cross_origin()
@@ -57,16 +61,18 @@ def initialize_repo():
                 "name": repo_name,
             },
         )
+        logging.info("Embedding workflow executed successfully")
     except ValueError as e:
+        logging.error(str(e))
         return jsonify(error=str(e)), 400
     return jsonify(message="Embedding workflow executed successfully"), 200
 
 
 @app.route("/v1/run-raja", methods=["POST"])
 def run_raja():
-    print("Running Raja")
+    logging.info("Running Raja")
     req_data = request.get_json()
-    print(req_data)
+    logging.info(req_data)
     try:
         task = run_raja_task.delay(req_data)  # This will now run as a Celery task
         return (
@@ -74,6 +80,7 @@ def run_raja():
             200,
         )
     except Exception as e:
+        logging.error(str(e))
         return jsonify(error=str(e)), 400
 
 
@@ -107,9 +114,9 @@ def delete_all_except_main():
         if branch.name != "main":
             try:
                 ghapi.git.delete_ref(ref=f"heads/{branch.name}")
-                print(f"Deleted branch: {branch.name}")
+                logging.info(f"Deleted branch: {branch.name}")
             except Exception as e:
-                print(f"Error deleting branch {branch.name}: {e}")
+                logging.error(f"Error deleting branch {branch.name}: {e}")
 
     return {}
 
@@ -117,14 +124,14 @@ def delete_all_except_main():
 @app.route("/v1/get-tickets", methods=["GET"])
 def get_tickets():
     tickets = client.query("tickets:get")
-    print(tickets)
+    logging.info(tickets)
     return tickets
 
 
 @app.route("/v1/create-ticket", methods=["POST"])
 def create_ticket():
     req_data = request.get_json()
-    print(req_data)
+    logging.info(req_data)
     client.mutation("tickets:createTicket", req_data)
     return {}
 
