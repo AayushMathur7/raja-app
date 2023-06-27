@@ -17,3 +17,13 @@ export const addRepo = mutation(async ({ db }, body) => {
 
   return repoId;
 });
+
+export const get_repo_info = (url) => {
+  const parsed_url = new URL(url);
+  const path_parts = parsed_url.pathname.split("/");
+
+  const repo_name = path_parts[path_parts.length - 1];
+  const owner = path_parts[path_parts.length - 2];
+
+  return { owner, repo_name };
+};

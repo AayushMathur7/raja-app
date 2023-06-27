@@ -157,7 +157,9 @@ def compute_prefix_and_zip_url(repo_url, main_branch="main"):
 def get_repo_info(url):
     # Parse the URL and split the path
     parsed_url = urlparse(url)
-    path_parts = parsed_url.path.split("/")
+    path_parts = parsed_url.path.strip("/").split("/")
+    if path_parts[-1] == "":
+        path_parts = path_parts[:-1]
 
     # The repo name is the last part of the path
     repo_name = path_parts[-1]
