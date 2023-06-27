@@ -2,7 +2,7 @@ import Head from 'next/head'
 import React, { useContext, useState } from 'react';
 import { TaskContext } from '@/contexts/TaskContext'
 import { StatusType } from '@/enums/StatusType'
-import { rajaAgent,getTickets } from '@/api/dashboard';
+import { rajaAgent, getTickets, checkRajaTaskStatus } from '@/api/dashboard';
 import { ConvexProvider, ConvexReactClient } from "convex/react";
 
 export default function TaskTable() {
