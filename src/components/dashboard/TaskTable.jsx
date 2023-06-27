@@ -17,6 +17,8 @@ export default function TaskTable() {
             return "In progress";
         } else if (status === StatusType.PR_READY_FOR_REVIEW) {
             return "PR ready for review";
+        } else if (status === StatusType.TASK_FAILED) {
+            return "Task failed";
         }
     }
 
@@ -27,6 +29,8 @@ export default function TaskTable() {
             return "bg-yellow-50 text-yellow-700 ring-yellow-600";
         } else if (status === StatusType.PR_READY_FOR_REVIEW) {
             return "bg-green-50 text-green-700 ring-green-600";
+        } else if (status === StatusType.TASK_FAILED) {
+            return "bg-red-50 text-red-700 ring-red-600";
         }
     }
 
@@ -101,6 +105,14 @@ export default function TaskTable() {
                       : task
                   );
                   updateTasks(updatedTasks);
+                } else if (data.status === 'FAILURE') {
+                  clearInterval(intervalId); // stop polling when the task is done
+                  updatedTasks = updatedTasks.map(task =>
+                    task.name === taskToUpdate.name
+                      ? { ...task, status: StatusType.TASK_FAILED }
+                      : task
+                  );
+                  updateTasks(updatedTasks);
                 }
               })
               .catch(err => {
@@ -111,10 +123,6 @@ export default function TaskTable() {
         })
         .catch(err => console.error(err));
     };
-
-
-
-
 
   return (
     <div className="px-4 sm:px-6 lg:px-8">
