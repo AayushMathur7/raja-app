@@ -1,6 +1,6 @@
 export const initializeRepo = async (userEmailId, userEmail, repoLink) => {
     try {
-        const response = await fetch('${process.env.APP_SERVER_URL}/v1/initialize-repo', {
+        const response = await fetch(`${process.env.APP_SERVER_URL}/v1/initialize-repo`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -32,7 +32,7 @@ export const rajaAgent = async (details) => {
     };
 
     try {
-        const response = await fetch('${process.env.APP_SERVER_URL}/v1/run-raja', {
+        const response = await fetch(`${process.env.APP_SERVER_URL}/v1/run-raja`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -54,7 +54,7 @@ export const rajaAgent = async (details) => {
 
 export const checkRajaTaskStatus = async (taskId) => {
     try {
-        const response = await fetch('${process.env.APP_SERVER_URL}/v1/tasks/${taskId}', {
+        const response = await fetch(`${process.env.APP_SERVER_URL}/v1/tasks/${taskId}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -75,7 +75,7 @@ export const checkRajaTaskStatus = async (taskId) => {
 
 export const getTickets = async () => {
     try {
-        const response = await fetch('${process.env.APP_SERVER_URL}/v1/get-tickets', {
+        const response = await fetch(`${process.env.APP_SERVER_URL}/v1/get-tickets`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -96,7 +96,7 @@ export const getTickets = async () => {
 
 export const createTicket = async (ticketData) => {
     try {
-        const response = await fetch('${process.env.APP_SERVER_URL}/v1/create-ticket', {
+        const response = await fetch(`${process.env.APP_SERVER_URL}/v1/create-ticket`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
