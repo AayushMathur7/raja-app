@@ -1,3 +1,2 @@
 web: cd server && gunicorn app:app
-
-worker: celery -A server.app.celery worker --loglevel=info
+worker: cd server && celery -A app.celery worker --loglevel=info
