@@ -79,19 +79,17 @@ export default function TaskTable() {
     const handleDeploy = (event, taskToUpdate) => {
       event.preventDefault();
 
-      let updatedTasks = tasks.map(task =>
-        task.name === taskToUpdate.name
-          ? { ...task, status: StatusType.IN_PROGRESS }
-          : task
-      );
-
-      updateTasks(updatedTasks);
-
       console.log("Deploying Raja for this task:", taskToUpdate?.name);
 
       rajaAgent(taskToUpdate)
         .then(taskId => {
-          // Poll checkRajaTaskStatus every 5 seconds until task is done
+          let updatedTasks = tasks.map(task =>
+            task.name === taskToUpdate.name
+              ? { ...task, status: StatusType.IN_PROGRESS }
+              : task
+          );
+          updateTasks(updatedTasks);
+
           const intervalId = setInterval(() => {
             checkRajaTaskStatus(taskId)
               .then(data => {
@@ -107,12 +105,13 @@ export default function TaskTable() {
               })
               .catch(err => {
                 console.error(err);
-                clearInterval(intervalId); // stop polling when there's an error
+                clearInterval(intervalId);
               });
-          }, 5000); // poll every 5 seconds
+          }, 10000);
         })
         .catch(err => console.error(err));
     };
+
 
 
 
