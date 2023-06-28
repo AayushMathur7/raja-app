@@ -75,6 +75,7 @@ export default function Dashboard() {
           </div>
           <label htmlFor="repository" className="block text-sm font-medium leading-6 text-gray-900">
             Repository used for demo:
+
             <a href="https://github.com/AayushMathur7/raja-app" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-700">
                 https://github.com/AayushMathur7/raja-app
             </a>
