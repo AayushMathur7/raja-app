@@ -48,6 +48,7 @@ export default function Dashboard() {
               placeholder="Enter repo link here"
               value={repoLink}
               onChange={e => setRepoLink(e.target.value)}
+              disabled
             />
              { repoIsInitializing ?
                   <button
@@ -66,11 +67,18 @@ export default function Dashboard() {
                   type="button"
                   className="rounded-md bg-indigo-50 px-2 py-1 text-sm font-medium text-indigo-600 shadow-sm hover:bg-indigo-100"
                   onClick={handleSubmit}
+                  disabled
                   >
                     Initialize repo
                   </button>
             }
           </div>
+          <label htmlFor="repository" className="block text-sm font-medium leading-6 text-gray-900">
+            Repository used for demo:
+            <a href="https://github.com/AayushMathur7/raja-app" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-700">
+                https://github.com/AayushMathur7/raja-app
+            </a>
+        </label>
         </div>
 
         <div className="mx-32 my-16 flex flex-row space-x-4">
