@@ -37,7 +37,7 @@ export default function Dashboard() {
         </div>
         <div className="m-32 mt-32 -mb-20">
           <label htmlFor="github_repo_link" className="block text-sm font-medium leading-6 text-gray-900">
-            Github Repo Link
+            Github Repo Link <span className="text-gray-500">(Repository must be public)</span>
           </label>
           <div className="mt-2 flex flex-row gap-4">
             <input
