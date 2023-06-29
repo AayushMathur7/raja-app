@@ -2,6 +2,7 @@ import React, { useContext, useState } from 'react';
 import { TaskContext } from '@/contexts/TaskContext'
 import { StatusType } from '@/enums/StatusType'
 import { createTicket } from '@/api/dashboard';
+import { useUser } from "@clerk/clerk-react";
 
 export default function TaskTemplate() {
 
@@ -14,6 +15,8 @@ export default function TaskTemplate() {
   const [howToReproduce, setHowToReproduce] = useState(null)
   const [emptyInputError, setEmptyInputError] = useState(false)
 
+  const { user } = useUser();
+
   const handleCreateTask = () => {
         console.log(name, type, description, acceptanceCriteria)
         if (name == null || type == null || description == null || acceptanceCriteria == null ) {
@@ -22,6 +25,7 @@ export default function TaskTemplate() {
         }
 
        const taskObj = {
+         user_id: user.primaryEmailAddressId,
          name: name,
          type: type,
          description: description,

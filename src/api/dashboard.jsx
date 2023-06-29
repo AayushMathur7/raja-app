@@ -1,3 +1,22 @@
+export const createUser = async (userData) => {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_APP_SERVER_URL}/v1/create-user`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(userData),
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+    } catch (error) {
+        console.error("Failed to create ticket:", error);
+    }
+}
+
 export const initializeRepo = async (userEmailId, userEmail, repoLink) => {
     try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_APP_SERVER_URL}/v1/initialize-repo`, {
@@ -73,9 +92,9 @@ export const checkRajaTaskStatus = async (taskId) => {
     }
 }
 
-export const getTickets = async () => {
+export const getTickets = async (userId) => {
     try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_APP_SERVER_URL}/v1/get-tickets`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_APP_SERVER_URL}/v1/get-tickets/${userId}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'

@@ -1,7 +1,6 @@
 import TaskTemplate from '@/components/dashboard/TaskTemplate'
 import TaskTable from '@/components/dashboard/TaskTable'
-// import { TicketTemplate } from '@/components/dashboard/TicketTemplate'
-import { initializeRepo, getTickets } from '@/api/dashboard';
+import { createUser, initializeRepo, getTickets } from '@/api/dashboard';
 import { useState, useContext, useRef, useEffect } from "react";
 import { ClerkProvider, UserButton, SignedIn, SignedOut, SignIn } from '@clerk/nextjs'
 import { useUser } from "@clerk/clerk-react";
@@ -15,9 +14,11 @@ export default function Dashboard() {
   const [repoIsInitializing, setRepoIsInitializing] = useState(false)
 
   const initialized = useRef(false)
-
   useEffect(() => {
-        getTickets().then(r => initializeTasks(r)).catch(err => console.error(err));
+        if (initialized.current == true) {
+            initialized.current = false
+            getTickets(user?.primaryEmailAddressId).then(r => initializeTasks(r)).catch(err => console.error(err));
+        }
   }, []);
 
   const handleSubmit = (event) => {
@@ -75,7 +76,7 @@ export default function Dashboard() {
           </div>
           <label htmlFor="repository" className="block text-sm font-medium leading-6 text-gray-900">
             Repository used for demo:
-
+           <span>{" "}</span>
             <a href="https://github.com/AayushMathur7/raja-app" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-700">
                 https://github.com/AayushMathur7/raja-app
             </a>

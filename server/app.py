@@ -61,7 +61,7 @@ def initialize_repo():
         return jsonify(error=str(e)), 400
     return jsonify(message="Embedding workflow executed successfully"), 200
 
-
+# Start running the celery agent
 @app.route("/v1/run-raja", methods=["POST"])
 def run_raja():
     print("Running Raja")
@@ -92,6 +92,7 @@ def get_task_status(task_id):
     return jsonify(response)
 
 
+# Called to deleted all branches except main to prevent unnecessary errors.
 @app.route("/v1/delete-all-except-main", methods=["POST"])
 def delete_all_except_main():
     req_data = request.get_json()
@@ -113,20 +114,27 @@ def delete_all_except_main():
 
     return {}
 
-
-@app.route("/v1/get-tickets", methods=["GET"])
+# Gets all tickets and displays on task table
+@app.route("/v1/get-tickets/<user_id>", methods=["GET"])
 def get_tickets():
     tickets = client.query("tickets:get")
     print(tickets)
     return tickets
 
-
+# Creates a ticket and saves it to db
 @app.route("/v1/create-ticket", methods=["POST"])
 def create_ticket():
     req_data = request.get_json()
     print(req_data)
     client.mutation("tickets:createTicket", req_data)
     return {}
+
+# @app.route("/v1/create-user", methods=["POST"])
+# def create_user():
+#     req_data = request.get_json()
+#     print(req_data)
+#     client.mutation("users:createUser", req_data)
+#     return {}
 
 
 if __name__ == "__main__":

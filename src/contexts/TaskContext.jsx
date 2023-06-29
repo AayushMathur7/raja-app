@@ -7,7 +7,7 @@ export const TaskProvider = ({ children }) => {
 
   // Function to add a new task
   const addTask = (newTask) => {
-    setTasks(prevTasks => [...prevTasks, newTask]);
+    setTasks((prevTasks) => [...prevTasks, newTask]);
   };
 
   const initializeTasks = (newTasks) => {

@@ -1,11 +1,18 @@
 import { query, mutation } from "./_generated/server";
 
-export const get = query(async ({ db }) => {
-  return await db.query("tickets").collect();
+export const get = query(async ({ db }, userId) => {
+  return await db.query("tickets").filter(q => q.eq(q.field("user_id"), userId)).collect();
 });
+
+const usersNamedAlex = await db
+  .query("users")
+  .filter(q => q.eq(q.field("name"), "Alex"))
+  .collect();
+
 
 export const createTicket = mutation(async ({ db }, body) => {
   const {
+    user_id = null,
     name = null,
     description = null,
     type = null,
@@ -14,7 +21,7 @@ export const createTicket = mutation(async ({ db }, body) => {
     status = null,
   } = body;
 
-  const ticketId = await db.insert("tickets", { name, description, type, acceptance_criteria, how_to_reproduce, status });
+  const ticketId = await db.insert("tickets", { user_id, name, description, type, acceptance_criteria, how_to_reproduce, status });
 
   return ticketId;
 });
