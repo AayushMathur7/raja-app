@@ -157,7 +157,7 @@ def compute_prefix_and_zip_url(repo_url, main_branch="main"):
 def get_repo_info(url):
     # Parse the URL and split the path
     parsed_url = urlparse(url)
-    path_parts = parsed_url.path.split("/")
+    path_parts = parsed_url.path.strip("/").split("/")
 
     # The repo name is the last part of the path
     repo_name = path_parts[-1]
@@ -166,3 +166,101 @@ def get_repo_info(url):
     owner = path_parts[-2]
 
     return owner, repo_name
+
+
+def raja_agent(details):
+    card = Card(**details)
+    file, metadata = {}, {}
+
+    document_description = "Stores the code in the file"
+
+    retriever = SelfQueryRetriever.from_llm(
+        LLM, vector_store, document_description, metadata_field_info, verbose=True
+    )
+
+    # Determine the appropriate file path based on the card type
+    if card.type == "bug":
+        get_relevant_file_path = "prompts/get_relevant_files_bug.txt"
+    elif card.type == "feature":
+        get_relevant_file_path = "prompts/get_relevant_files_feature.txt"
+    else:
+        raise ValueError(f"Unsupported card type: {card.type}")
+
+    get_relevant_file_paths = load_prompt_from_file(get_relevant_file_path, vars(card))
+
+    print(get_relevant_file_paths)
+
+    relevant_documents = retriever.get_relevant_documents(get_relevant_file_paths)
+
+    for template_name, variables in TEMPLATE_VARIABLES[card.type].items():
+        kwargs = {var: getattr(card, var, "") for var in variables}
+
+        if template_name == card.type:
+            file_objects = ""
+            for document in relevant_documents:
+                repo_info = client.query("repo:get")[0]
+                repo_name = repo_info["name"]
+                repo_owner = repo_info["owner"]
+                ghapi_client = GhApi(owner=repo_owner, repo=repo_name, token=GH_TOKEN)
+                ghapi_raja_client = GhApi(
+                    owner=repo_owner, repo=repo_name, token=RAJA_TOKEN
+                )
+                file_path = document.metadata["document_id"]
+                print(file_path)
+
+                # Remove repository name from the file path if it is there
+                repo_name_with_slash = f"{repo_name}-main/"
+                truncated_file_path = file_path
+                if file_path.startswith(repo_name_with_slash):
+                    truncated_file_path = file_path.replace(repo_name_with_slash, "", 1)
+
+                try:
+                    commits = ghapi_client.repos.list_commits(path=truncated_file_path)
+                except Exception as e:
+                    print(f"Failed to get commits for file: {file_path}")
+                    print(f"Error: {e}")
+                    commits = None
+
+                if commits:
+                    latest_commit_sha = commits[0].sha
+                    try:
+                        file_content = ghapi_client.repos.get_content(
+                            path=truncated_file_path, ref=latest_commit_sha
+                        )
+                        decoded_content = base64.b64decode(file_content.content).decode(
+                            "utf-8"
+                        )
+                        num_lines = len(decoded_content.splitlines())
+
+                        # Check if the file is too large
+                        if num_lines > 1000:
+                            print(f"File {file_path} is too large, skipping...")
+                            relevant_documents.remove(document)
+                            continue
+
+                        file_objects += (
+                            f"Code for the following {file_path}: \n {decoded_content} "
+                        )
+                    except Exception as e:
+                        print(f"Failed to get file content for file: {file_path}")
+                        print(f"Error: {e}")
+                        continue
+                else:
+                    print(f"No commits found for file: {file_path}")
+
+            kwargs["file_objects"] = file_objects
+
+            file = generate_code(
+                file, card.type, template_name, variables, relevant_documents, **kwargs
+            )
+        else:
+            template_str = load_template_from_file(
+                TEMPLATE_FILEPATHS[card.type][template_name], variables
+            )
+            metadata[template_name] = run_llm_chain(template_str, **kwargs)
+
+    pull_request_url = create_github_pull_request(
+        ghapi_client, ghapi_raja_client, file, metadata
+    )
+
+    return pull_request_url
