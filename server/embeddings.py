@@ -38,12 +38,7 @@ pinecone.init(
     api_key=PINECONE_API_KEY,
     environment=PINECONE_ENVIRONMENT,
 )
-vector_store = Pinecone(
-    index=pinecone.Index("raja-app"),
-    embedding_function=embeddings.embed_query,
-    text_key="text",
-    namespace="raja-app",
-)
+
 metadata_field_info = [
     AttributeInfo(
         name="document_id",
@@ -98,8 +93,8 @@ def execute_embedding_workflow(repo_url, folder_path):
     vector_store.from_documents(
         documents=split_documents,
         embedding=embeddings,
-        index_name="raja-app",
-        namespace="raja-app",
+        index_name=repo_url,
+        namespace=repo_url,
     )
 
     print("Embedding workflow executed successfully")
