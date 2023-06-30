@@ -77,6 +77,8 @@ export default function TaskTable() {
             >
                 View PR
             </button>
+        case StatusType.TASK_FAILED:
+            return null;
       }
     }
 
