@@ -172,6 +172,12 @@ export default function TaskTable() {
           </div>
         </div>
       </div>
+      <button
+        type="button"
+        className="rounded-md bg-gray-300 px-4 py-2 text-[14px] font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-400"
+      >
+        Filter
+      </button>
     </div>
   )
 }
