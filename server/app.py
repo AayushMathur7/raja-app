@@ -42,21 +42,27 @@ def initialize_repo():
     user_id = req_data["user_id"]
     user_email = req_data["user_email"]
     repo_url = req_data["repo_url"]
+    loadedPreviously = req_data["loadedPreviously"]
+
+    #Remove existing index before init
+    embeddings.pinecone.delete_index("raja-app")
 
     try:
         folder_path, zip_url = embeddings.compute_prefix_and_zip_url(repo_url)
         embeddings.execute_embedding_workflow(zip_url, folder_path)
         repo_owner, repo_name = embeddings.get_repo_info(repo_url)
-        client.mutation(
-            "repo:addRepo",
-            {
-                "user_id": user_id,
-                "user_email": user_email,
-                "url": repo_url,
-                "owner": repo_owner,
-                "name": repo_name,
-            },
-        )
+        #Add repo to convex if not present
+        if not loadedPreviously:
+            client.mutation(
+                "repo:addRepo",
+                {
+                    "user_id": user_id,
+                    "user_email": user_email,
+                    "url": repo_url,
+                    "owner": repo_owner,
+                    "name": repo_name,
+                },
+            )
     except ValueError as e:
         return jsonify(error=str(e)), 400
     return jsonify(message="Embedding workflow executed successfully"), 200
@@ -120,6 +126,13 @@ def get_tickets():
     tickets = client.query("tickets:get")
     print(tickets)
     return tickets
+
+# Gets all of users repos 
+@app.route("/v1/get-repos/<user_id>", methods=["GET"])
+def get_repos(user_id):
+    repos = client.query("repo:get")
+    # return repos
+    return [x["url"] for x in repos if x["user_id"] == user_id]
 
 # Creates a ticket and saves it to db
 @app.route("/v1/create-ticket", methods=["POST"])
