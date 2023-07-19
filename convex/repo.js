@@ -17,3 +17,8 @@ export const addRepo = mutation(async ({ db }, body) => {
 
   return repoId;
 });
+
+//Filter particular users repos (Untested as had issues wiht running convex)
+export const userRepo = query(async ({ db, user_id }) => {
+  return await db.query("repo").filter(q => q.eq(q.field("user_id"), user_id)).collect();
+});

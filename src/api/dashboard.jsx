@@ -17,14 +17,15 @@ export const createUser = async (userData) => {
     }
 }
 
-export const initializeRepo = async (userEmailId, userEmail, repoLink) => {
+//Add variable to track if the current repo has been used before (Differentiate between initialize and load)
+export const initializeRepo = async (userEmailId, userEmail, repoLink, presentInRepos) => {
     try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_APP_SERVER_URL}/v1/initialize-repo`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ user_id: userEmailId, user_email: userEmail, repo_url: repoLink })
+            body: JSON.stringify({ user_id: userEmailId, user_email: userEmail, repo_url: repoLink , loadedPreviously: presentInRepos})
         });
 
         if (!response.ok) {
@@ -110,6 +111,28 @@ export const getTickets = async (userId) => {
 
     } catch (error) {
         console.error("Failed to fetch tickets:", error);
+    }
+}
+
+//Get repos for a person
+export const getRepos = async (userId) => {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_APP_SERVER_URL}/v1/get-repos/${userId}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        return data;
+
+    } catch (error) {
+        console.error("Failed to fetch:", error);
     }
 }
 
