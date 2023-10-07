@@ -1,104 +1,83 @@
-import TaskTemplate from '@/components/dashboard/TaskTemplate'
-import TaskTable from '@/components/dashboard/TaskTable'
-import { createUser, initializeRepo, getTickets } from '@/api/dashboard';
-import { useState, useContext, useRef, useEffect } from "react";
-import { ClerkProvider, UserButton, SignedIn, SignedOut, SignIn } from '@clerk/nextjs'
-import { useUser } from "@clerk/clerk-react";
-import { TaskContext } from '@/contexts/TaskContext'
-import { Logo } from '@/components/Logo'
+// import { promises as fs } from "fs"
+import path from "path"
+import { Metadata } from "next"
+import Image from "next/image"
+import { z } from "zod"
 
-export default function Dashboard() {
-  const [repoLink, setRepoLink] = useState("");
-  const { user } = useUser();
-  const { tasks, addTask, initializeTasks, updateTask } = useContext(TaskContext);
-  const [repoIsInitializing, setRepoIsInitializing] = useState(false)
+import { columns } from "../components/taskTable/columns"
+import { DataTable } from "../components/taskTable/data-table"
+import { UserNav } from "../components/taskTable/user-nav"
+import { taskSchema } from "../data/schema"
 
-  const initialized = useRef(false)
-  useEffect(() => {
-        if (initialized.current == true) {
-            initialized.current = false
-            getTickets(user?.primaryEmailAddressId).then(r => initializeTasks(r)).catch(err => console.error(err));
-        }
-  }, []);
+export const metadata = {
+  title: "Tasks",
+  description: "A task and issue tracker build using Tanstack Table.",
+}
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    console.log("Submitting repo link:", repoLink)
-    setRepoIsInitializing(true)
-    initializeRepo(user.primaryEmailAddressId, user.primaryEmailAddress, repoLink).then(r => setRepoIsInitializing(false)).catch(err => console.error(err));
-  }
+// Simulate a database read for tasks.
+function getTasks() {
+  // const data = fs.readFile(
+  //   path.join(process.cwd(), "../data/tasks.json")
+  // )
+  const data = [
+    {
+      "id": "TASK-8782",
+      "title": "You can't compress the program without quantifying the open-source SSD pixel!",
+      "status": "in progress",
+      "label": "documentation",
+      "priority": "medium"
+    },
+    {
+      "id": "TASK-7878",
+      "title": "Try to calculate the EXE feed, maybe it will index the multi-byte pixel!",
+      "status": "backlog",
+      "label": "documentation",
+      "priority": "medium"
+    }
+  ]
+  
+  // const tasks = JSON.parse(data.toString())
+  console.log(z.array(taskSchema).parse(data))
+  // console.log(tasks)
+  return z.array(taskSchema).parse(data)
+  // return data
+}
 
-  return <>
-    <SignedIn>
-    <div className="absolute left-0 p-8">
-            <Logo className="h-10 w-auto" />
-        </div>
-        <div className="absolute right-0 p-8">
-            <UserButton />
-        </div>
-        <div className="m-32 mt-32 -mb-20">
-          <label htmlFor="github_repo_link" className="block text-sm font-medium leading-6 text-gray-900">
-            Github Repo Link <span className="text-gray-500">(Repository must be public)</span>
-          </label>
-          <div className="mt-2 flex flex-row gap-4">
-            <input
-              type="text"
-              name="github_repo_link"
-              id="github_repo_link"
-              className="block w-[478px] rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-              placeholder="Enter repo link here"
-              value={repoLink}
-              onChange={e => setRepoLink(e.target.value)}
-              disabled
-            />
-             { repoIsInitializing ?
-                  <button
-                  type="button"
-                  className="bg-white px-2 py-1 text-sm font-medium text-indigo-600"
-                  >
-                    <div
-                      className="ml-7 flex justify-center items-center text-indigo-700 ring-indigo-600 h-4 w-4 animate-spin rounded-full border-2 border-solid border-current border-r-transparent align-[-0.125em] text-primary motion-reduce:animate-[spin_1.5s_linear_infinite]"
-                      role="status">
-                      <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]"></span>
-                    </div>
-                  </button>
+export default function dashboard() {
+  const tasks = getTasks()
 
-             :
-                 <button
-                  type="button"
-                  className="rounded-md bg-indigo-50 px-2 py-1 text-sm font-medium text-indigo-600 shadow-sm hover:bg-indigo-100"
-                  onClick={handleSubmit}
-                  disabled
-                  >
-                    Initialize repo
-                  </button>
-            }
+  return (
+    <>
+      <div className="">
+        {/* <Image
+          src="/examples/tasks-light.png"
+          width={1280}
+          height={998}
+          alt="Playground"
+          className="block dark:hidden"
+        />
+        <Image
+          src="/examples/tasks-dark.png"
+          width={1280}
+          height={998}
+          alt="Playground"
+          className="hidden dark:block"
+        /> */}
+      </div>
+      <div className=" h-full flex-1 flex-col space-y-8 p-8 md:flex">
+        <div className="flex items-center justify-between space-y-2">
+          <div>
+            <h2 className="text-2xl font-bold tracking-tight">Welcome back!</h2>
+            <p className="text-muted-foreground">
+              Here&apos;s a list of your tasks for this month!
+            </p>
           </div>
-          <label htmlFor="repository" className="block text-sm font-medium leading-6 text-gray-900">
-            Repository used for demo:
-           <span>{" "}</span>
-            <a href="https://github.com/AayushMathur7/raja-app" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-700">
-                https://github.com/AayushMathur7/raja-app
-            </a>
-        </label>
-        </div>
-
-        <div className="mx-32 my-16 flex flex-row space-x-4">
-          <TaskTemplate />
-          <TaskTable />
-        </div>
-    </SignedIn>
-    <SignedOut>
-        <main className="grid min-h-full place-items-center bg-white px-6 py-24 sm:py-32 lg:px-8">
-        <div className="text-center">
-          <p className="text-base font-semibold text-indigo-600">404</p>
-          <h1 className="mt-4 text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl">Page not found</h1>
-          <p className="mt-6 text-base leading-7 text-gray-600">Sorry, we couldn’t find the page you’re looking for.</p>
-          <div className="mt-10 flex items-center justify-center gap-x-6">
+          <div className="flex items-center space-x-2">
+            <UserNav />
           </div>
         </div>
-      </main>
-    </SignedOut>
-  </>
-
+        <DataTable data={tasks} columns={columns} />
+      </div>
+    </>
+  )
 }

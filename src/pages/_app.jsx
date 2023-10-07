@@ -1,7 +1,7 @@
 import 'focus-visible'
-import '@/styles/tailwind.css'
+import '../styles/tailwind.css'
 import { ClerkProvider, SignedOut } from '@clerk/nextjs'
-import { TaskProvider } from '@/contexts/TaskContext'
+import { TaskProvider } from '../contexts/TaskContext'
 
 export default function App({ Component, pageProps }) {
   return (

@@ -3,12 +3,12 @@ import Image from 'next/image'
 import { Tab } from '@headlessui/react'
 import clsx from 'clsx'
 
-import { Container } from '@/components/Container'
-import backgroundImage from '@/images/background-features.jpg'
-import createTrello from '@/images/screenshots/create-trello.png'
-import generatePR from '@/images/screenshots/generated-pr.png'
-import manageDashboard from '@/images/screenshots/manage-dashboard.png'
-import dashboard from '@/images/screenshots/dashboard.png'
+import { Container } from '../components/Container'
+import backgroundImage from '../images/background-features.jpg'
+import createTrello from '../images/screenshots/create-trello.png'
+import generatePR from '../images/screenshots/generated-pr.png'
+import manageDashboard from '../images/screenshots/manage-dashboard.png'
+import dashboard from '../images/screenshots/dashboard.png'
 
 const features = [
   {
