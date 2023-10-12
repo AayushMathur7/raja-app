@@ -8,8 +8,6 @@ import { Container } from '../components/Container'
 import { Logo } from '../components/Logo'
 import { NavLink } from '../components/NavLink'
 
-import { ClerkProvider, UserButton, SignedIn, SignedOut, SignIn } from '@clerk/nextjs'
-
 
 function MobileNavLink({ href, children }) {
   return (
@@ -96,21 +94,13 @@ export function Header() {
       <Container>
         <nav className="relative z-50 flex justify-between">
           <div className="flex items-center font-semibold md:gap-x-12 text-blue-600 text-md">
-             <Link href="#" aria-label="Home">
+             <Link href="/" aria-label="Home">
                <Logo className="h-10 w-auto" />
              </Link>
             <div className="hidden md:flex md:gap-x-6">
             </div>
           </div>
 
-          <SignedIn>
-          <Button href="/dashboard" color="blue">
-              <span>
-                View dashboard →<span className="hidden lg:inline"></span>
-              </span>
-            </Button>
-          </SignedIn>
-          <SignedOut>
           <div className="flex items-center gap-x-5 md:gap-x-8">
             <div className="hidden md:block">
               <NavLink href="/login">Sign in</NavLink>
@@ -124,7 +114,6 @@ export function Header() {
               <MobileNavigation />
             </div>
           </div>
-          </SignedOut>
 
         </nav>
       </Container>

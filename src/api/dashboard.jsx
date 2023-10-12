@@ -64,7 +64,6 @@ export const rajaAgent = async (details) => {
         }
 
         const data = await response.json();
-        return data.task_id;
 
     } catch (error) {
         console.error("Failed to run raja agent:", error);

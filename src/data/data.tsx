@@ -18,25 +18,16 @@ import {
       value: "feature",
       label: "Feature",
     },
-    {
-      value: "documentation",
-      label: "Documentation",
-    },
   ]
   
   export const statuses = [
-    {
-      value: "backlog",
-      label: "Backlog",
-      icon: QuestionMarkCircledIcon,
-    },
     {
       value: "todo",
       label: "Todo",
       icon: CircleIcon,
     },
     {
-      value: "in progress",
+      value: "in_progress",
       label: "In Progress",
       icon: StopwatchIcon,
     },
@@ -46,8 +37,8 @@ import {
       icon: CheckCircledIcon,
     },
     {
-      value: "canceled",
-      label: "Canceled",
+      value: "failed",
+      label: "Failed",
       icon: CrossCircledIcon,
     },
   ]

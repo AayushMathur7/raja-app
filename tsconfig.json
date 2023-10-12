@@ -115,7 +115,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts"
-, "src/components/taskTable"  ],
+, "src/components/tasks"  ],
   "exclude": [
     "node_modules"
   ]

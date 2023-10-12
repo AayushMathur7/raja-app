@@ -14,7 +14,8 @@ import {
     DropdownMenuShortcut,
     DropdownMenuTrigger,
   } from "../ui/dropdown-menu"
-  
+  import React from 'react';
+
   export function UserNav() {
     return (
       <DropdownMenu>

@@ -1,141 +1,15 @@
-import os
+from fastapi import FastAPI, HTTPException
+from models import Item
+from typing import List, Any
+from motor.motor_asyncio import AsyncIOMotorClient
 
-import embeddings
-import raja
-from celery import Celery
-from dotenv import load_dotenv
-from flask import Flask, jsonify, request
-from flask_cors import CORS, cross_origin
-from ghapi.all import GhApi
+app = FastAPI()
 
-from convex import ConvexClient
-
-app = Flask("Raja")
-cors = CORS(app)
-
-# Initialize Celery
-celery = Celery(
-    app.name,
-    broker=os.environ["CLOUDAMQP_URL"],
-    backend=os.environ["REDIS_URL"],
-)
-
-# get the directory of the current script
-current_dir = os.path.dirname(os.path.abspath(__file__))
-
-# go up one level to get the root directory
-root_dir = os.path.dirname(current_dir)
-
-dotenv_path = os.path.join(root_dir, ".env.local")
-
-# load the .env file
-load_dotenv(dotenv_path)
-
-client = ConvexClient(os.getenv("NEXT_PUBLIC_CONVEX_URL"))
-GH_TOKEN = os.getenv("GH_TOKEN", "")
+client = AsyncIOMotorClient("mongodb://localhost:27017/")  
+db = client["raja"]  
 
 
-@app.route("/v1/initialize-repo", methods=["POST"])
-@cross_origin()
-def initialize_repo():
-    req_data = request.get_json()
-    user_id = req_data["user_id"]
-    user_email = req_data["user_email"]
-    repo_url = req_data["repo_url"]
-
-    try:
-        folder_path, zip_url = embeddings.compute_prefix_and_zip_url(repo_url)
-        embeddings.execute_embedding_workflow(zip_url, folder_path)
-        repo_owner, repo_name = embeddings.get_repo_info(repo_url)
-        client.mutation(
-            "repo:addRepo",
-            {
-                "user_id": user_id,
-                "user_email": user_email,
-                "url": repo_url,
-                "owner": repo_owner,
-                "name": repo_name,
-            },
-        )
-    except ValueError as e:
-        return jsonify(error=str(e)), 400
-    return jsonify(message="Embedding workflow executed successfully"), 200
-
-# Start running the celery agent
-@app.route("/v1/run-raja", methods=["POST"])
-def run_raja():
-    print("Running Raja")
-    req_data = request.get_json()
-    print(req_data)
-    try:
-        task = run_raja_task.delay(req_data)  # This will now run as a Celery task
-        return (
-            jsonify(message="Raja workflow initiated successfully", task_id=task.id),
-            200,
-        )
-    except Exception as e:
-        return jsonify(error=str(e)), 400
-
-
-@celery.task
-def run_raja_task(req_data):
-    pr_url = raja.raja_agent(req_data)
-    return pr_url
-
-
-@app.route("/v1/tasks/<task_id>", methods=["GET"])
-def get_task_status(task_id):
-    task = celery.AsyncResult(task_id)
-    response = {"task_id": task.id, "status": task.status}
-    if task.status == "SUCCESS":
-        response["result"] = task.result  # This is where you could return the PR URL
-    return jsonify(response)
-
-
-# Called to deleted all branches except main to prevent unnecessary errors.
-@app.route("/v1/delete-all-except-main", methods=["POST"])
-def delete_all_except_main():
-    req_data = request.get_json()
-    repo_owner = req_data["repo_owner"]
-    repo_name = req_data["repo_name"]
-    ghapi = GhApi(owner=repo_owner, repo=repo_name, token=GH_TOKEN)
-
-    # Get all branches
-    branches = ghapi.repos.list_branches()
-
-    for branch in branches:
-        # Delete the branch if its name is not 'main'
-        if branch.name != "main":
-            try:
-                ghapi.git.delete_ref(ref=f"heads/{branch.name}")
-                print(f"Deleted branch: {branch.name}")
-            except Exception as e:
-                print(f"Error deleting branch {branch.name}: {e}")
-
-    return {}
-
-# Gets all tickets and displays on task table
-@app.route("/v1/get-tickets/<user_id>", methods=["GET"])
-def get_tickets():
-    tickets = client.query("tickets:get")
-    print(tickets)
-    return tickets
-
-# Creates a ticket and saves it to db
-@app.route("/v1/create-ticket", methods=["POST"])
-def create_ticket():
-    req_data = request.get_json()
-    print(req_data)
-    client.mutation("tickets:createTicket", req_data)
-    return {}
-
-# @app.route("/v1/create-user", methods=["POST"])
-# def create_user():
-#     req_data = request.get_json()
-#     print(req_data)
-#     client.mutation("users:createUser", req_data)
-#     return {}
-
-
-if __name__ == "__main__":
-    app.run(port=5000, debug=True)
+@app.get("/tasks", response_model=List[Any])
+async def get_all_tasks():
+    tasks = await db.tasks.find().to_list(length=100)
+    return tasks

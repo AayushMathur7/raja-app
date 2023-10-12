@@ -5,7 +5,8 @@ import {
     DoubleArrowRightIcon,
   } from "@radix-ui/react-icons"
   import { Table } from "@tanstack/react-table"
-  
+  import React from 'react';
+
   import { Button } from "../ui/button"
   import {
     Select,
@@ -37,11 +38,11 @@ import {
                 table.setPageSize(Number(value))
               }}
             >
-              <SelectTrigger className="h-8 w-[70px]">
+              <SelectTrigger className="h-8 w-16">
                 <SelectValue placeholder={table.getState().pagination.pageSize} />
               </SelectTrigger>
               <SelectContent side="top">
-                {[10, 20, 30, 40, 50].map((pageSize) => (
+                {[5, 10, 20, 30, 40].map((pageSize) => (
                   <SelectItem key={pageSize} value={`${pageSize}`}>
                     {pageSize}
                   </SelectItem>

@@ -25,6 +25,11 @@ celery = "*"
 app = "*"
 amqp = "*"
 redis = "*"
+fastapi = "*"
+uvicorn = "*"
+pymongo = "*"
+pydantic = "*"
+motor = "*"
 
 [dev-packages]
 
