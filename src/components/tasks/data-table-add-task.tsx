@@ -1,5 +1,6 @@
 "use client"
-import React from 'react';
+import React, { useState, useContext } from 'react';
+import { TaskContext } from "../../contexts/TaskContext";
 import { Table } from "@tanstack/react-table"
 import { Button } from "../ui/button"
 import {
@@ -37,6 +38,7 @@ import {
 } from "../ui/select"
 import { Textarea } from "../ui/textarea"
 import { toast } from "../ui/use-toast"
+import { createTask } from "../../api/API"; 
 
 interface DataTableAddTaskProps<TData> {
   table: Table<TData>
@@ -58,11 +60,15 @@ const profileFormSchema = z.object({
 type ProfileFormValues = z.infer<typeof profileFormSchema>
 
 const defaultValues: Partial<ProfileFormValues> = {
+  title: "",
+  description: "",
+  acceptance_criteria: "",
 }
 
 export function DataTableAddTask<TData>({
   table,
 }: DataTableAddTaskProps<TData>) {
+  const taskContext = useContext(TaskContext)
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
@@ -71,6 +77,11 @@ export function DataTableAddTask<TData>({
   })
 
   function onSubmit(data: ProfileFormValues) {
+    createTask(data).then((response) => {
+      taskContext.addTask(response);
+      form.reset(defaultValues);
+    });
+
     toast({
       title: "You submitted the following values:",
       description: (
@@ -78,7 +89,7 @@ export function DataTableAddTask<TData>({
           <code className="text-white">{JSON.stringify(data, null, 2)}</code>
         </pre>
       ),
-    })
+    });
   }
 
   return (
@@ -91,7 +102,7 @@ export function DataTableAddTask<TData>({
           <AlertDialogTitle>Create a new tasks</AlertDialogTitle>
 
           <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form className="space-y-4">
         <FormField
           control={form.control}
           name="title"
@@ -130,7 +141,7 @@ export function DataTableAddTask<TData>({
               <FormLabel>Acceptance Criteria</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder="Describe your tasks in detail"
+                  placeholder="Describe your acceptance criteria"
                   className="resize-none"
                   {...field}
                 />
@@ -146,9 +157,7 @@ export function DataTableAddTask<TData>({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction  onClick={() => {
-            console.log("sss")
-          }}>Continue</AlertDialogAction>
+          <AlertDialogAction  onClick={() => onSubmit(form.getValues())}>Create</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

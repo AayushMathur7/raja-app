@@ -18,26 +18,36 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu"
-
+import { TaskContext } from "../../contexts/TaskContext";
+import { useContext } from "react"
 import { labels } from "../../data/data"
 import { taskSchema } from "../../data/schema"
+import { deleteTask } from "../../api/API"
 
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>
-  onDelete: (row: Row<TData>) => void
 }
 
 export function DataTableRowActions<TData>({
   row,
-  onDelete,
 }: DataTableRowActionsProps<TData>) {
-  const task = taskSchema.parse(row.original)
+  const taskContext = useContext(TaskContext)
+  const task = row.original
+  console.log(task)
 
-  // const handleDelete = () => {
-  //   if (onDelete) {
-  //     onDelete(task.id);
-  //   }
-  // };
+
+  async function taskDeletion(task: any) {
+    try {
+      const data = await deleteTask(task.task_id).then(() => {
+        taskContext.setTasks(taskContext.tasks.filter((t: any) => t.task_id !== task.task_id))
+      })
+      .catch((err) => {
+        console.error(err);
+      });;
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   return (
     <DropdownMenu>
@@ -55,9 +65,12 @@ export function DataTableRowActions<TData>({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[160px]">
-        <DropdownMenuItem>Edit</DropdownMenuItem>
-        <DropdownMenuItem onClick={() => onDelete()}>
-          Delete
+        <DropdownMenuItem className="cursor-pointer" onClick={() => {
+          // runAgent()
+        }}
+        >Deploy</DropdownMenuItem>
+        <DropdownMenuItem className="cursor-pointer" onClick={() => taskDeletion(task)}
+        >Delete
           <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
         </DropdownMenuItem>
       </DropdownMenuContent>

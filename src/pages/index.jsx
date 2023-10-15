@@ -4,32 +4,38 @@ import { columns } from "../components/tasks/columns"
 import { DataTable } from "../components/tasks/data-table"
 import { taskSchema } from "../data/schema"
 import { getAllTasks } from "../api/API"; 
+import { useState, useEffect, useRef, useContext } from "react";
+import { TaskContext } from "../contexts/TaskContext";
 
 export const metadata = {
   title: "Tasks",
   description: "A task and issue tracker build using Tanstack Table.",
 }
 
-// Simulate a database read for tasks.
-// function getTasks() {
-  // const data = require("../data/tasks.json")
-  
-  // console.log(z.array(taskSchema).parse(data))
-  // // console.log(tasks)
-  // return z.array(taskSchema).parse(data)
-  // return data
-// }
-const fetchTasks = async () => {
+async function fetchTasks() {
   try {
     const data = await getAllTasks();
     return data;
   } catch (err) {
-    // setError(err.message);
+    console.error(err);
   }
 };
 
-export default function dashboard() {
-  const tasks = fetchTasks()
+
+export default function Dashboard() {
+  const taskContext = useContext(TaskContext);
+
+  const initialized = useRef(false);
+  useEffect(() => {
+    if (initialized.current) return;
+    initialized.current = true;
+    fetchTasks().then((data) => {taskContext.setTasks(data)})
+    .catch((err) => {
+      console.error(err);
+    });
+  },[]
+  );
+  
 
   return (
     <>
@@ -38,13 +44,13 @@ export default function dashboard() {
           <div>
             <h2 className="text-2xl font-bold tracking-tight">Welcome back!</h2>
             <p className="text-muted-foreground">
-              Here&apos;s a list of your tasks for this month!
+              Here&apos;s a list of your tasks.
             </p>
           </div>
           <div className="flex items-center space-x-2">
           </div>
         </div>
-        <DataTable data={tasks} columns={columns} />
+        <DataTable data={taskContext.tasks} columns={columns} />
       </div>
     </>
   )

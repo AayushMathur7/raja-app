@@ -24,22 +24,22 @@ import {
     {
       value: "todo",
       label: "Todo",
-      icon: CircleIcon,
+      class: "bg-blue-50 text-blue-700 ring-blue-600",
     },
     {
       value: "in_progress",
       label: "In Progress",
-      icon: StopwatchIcon,
+      class: "bg-yellow-50 text-yellow-700 ring-yellow-600",
     },
     {
       value: "done",
       label: "Done",
-      icon: CheckCircledIcon,
+      class: "bg-green-50 text-green-700 ring-green-600",
     },
     {
       value: "failed",
       label: "Failed",
-      icon: CrossCircledIcon,
+      class: "bg-red-50 text-red-700 ring-red-600",
     },
   ]
   

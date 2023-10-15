@@ -21,7 +21,7 @@ celery = Celery(
 )
 
 # get the directory of the current script
-current_dir = os.path.dirname(os.path.abspath(__file__))
+current_dir = os.path.dirname(os.path.abspath(__file__)) 
 
 # go up one level to get the root directory
 root_dir = os.path.dirname(current_dir)
@@ -70,7 +70,7 @@ def run_raja():
     try:
         task = run_raja_task.delay(req_data)  # This will now run as a Celery task
         return (
-            jsonify(message="Raja workflow initiated successfully", task_id=task.id),
+            jsonify(message="Raja workflow initiated successfully", task_id=task.id), 
             200,
         )
     except Exception as e:

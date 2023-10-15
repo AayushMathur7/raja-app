@@ -4,21 +4,19 @@ import React from 'react';
 import { ColumnDef } from "@tanstack/react-table"
 
 import { Badge } from "../ui/badge"
-import { Checkbox } from "../ui/checkbox"
 
 import { labels, priorities, statuses } from "../../data/data"
-// import Task from "../../data/tasks.json"
 
 import { DataTableColumnHeader } from "./data-table-column-header"
 import { DataTableRowActions } from "./data-table-row-actions"
 
 export const columns: ColumnDef<any>[] = [
   {
-    accessorKey: "id",
+    accessorKey: "task_id",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Task" />
     ),
-    cell: ({ row }) => <div className="w-[90px]">{row.getValue("id")}</div>,
+    cell: ({ row }) => <div className="w-[70px]">{row.getValue("task_id")}</div>,
     enableSorting: false,
     enableHiding: false,
   },
@@ -55,10 +53,7 @@ export const columns: ColumnDef<any>[] = [
       }
 
       return (
-        <div className="flex w-[120px] items-center">
-          {status.icon && (
-            <status.icon className="mr-2 h-4 w-4 text-muted-foreground" />
-          )}
+        <div className={`flex justify-center font-[500] text-[12px] rounded-xl px-3 items-center ${status.class}`} style={{ display: 'inline-block' }}>
           <span>{status.label}</span>
         </div>
       )
@@ -97,13 +92,11 @@ export const columns: ColumnDef<any>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
-      const task = row.original
-      console.log(task)
-      function deleteTask() {
-        row.delete()
-      }
+
     return (
-      <DataTableRowActions row={row} onDelete={deleteTask}/>
+      <div className="flex ml-0 justify-end">
+        <DataTableRowActions row={row}/>
+      </div>
     )},
   },
 ]
